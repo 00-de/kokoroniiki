@@ -17,6 +17,10 @@ user-scalable=no
 name="apple-mobile-web-app-capable"
 content="yes">
 
+<meta
+name="theme-color"
+content="#ffd6ea">
+
 <title>こころ日記 完全版DX+</title>
 
 <style>
@@ -28,6 +32,10 @@ content="yes">
 *{
   box-sizing:border-box;
   -webkit-tap-highlight-color:transparent;
+}
+
+html{
+  scroll-behavior:smooth;
 }
 
 body{
@@ -164,6 +172,12 @@ button{
   font-weight:bold;
 
   cursor:pointer;
+
+  transition:0.2s;
+}
+
+button:active{
+  transform:scale(0.98);
 }
 
 .mainBtn{
@@ -274,6 +288,35 @@ textarea{
   gap:10px;
 }
 
+.checkArea{
+
+  background:#f7f7f7;
+
+  padding:16px;
+
+  border-radius:18px;
+
+  line-height:2;
+}
+
+.fadeIn{
+  animation:fade 0.5s;
+}
+
+@keyframes fade{
+
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+}
+
 @media(max-width:600px){
 
   .menuGrid{
@@ -364,7 +407,7 @@ onclick="saveSettings()">
 
 <!-- 日時 -->
 
-<div class="card">
+<div class="card fadeIn">
 
 <div
 id="date"
@@ -396,7 +439,7 @@ class="small">
 
 <!-- 今日予定 -->
 
-<div class="card">
+<div class="card fadeIn">
 
 <div class="sectionTitle">
 🗓️ 今日の予定
@@ -431,52 +474,38 @@ class="previewBox">
 <button
 class="menuBtn"
 onclick="toggleTodayItem('💼 仕事')">
-
 💼 仕事
-
 </button>
 
 <button
 class="menuBtn"
 onclick="toggleTodayItem('🏥 病院')">
-
 🏥 病院
-
 </button>
 
 <button
 class="menuBtn"
 onclick="toggleTodayItem('🛒 買い物')">
-
 🛒 買い物
-
 </button>
 
 <button
 class="menuBtn"
 onclick="toggleTodayItem('🎈 遊び')">
-
 🎈 遊び
-
 </button>
 
 <button
 class="menuBtn"
 onclick="toggleTodayItem('🎨 趣味')">
-
 🎨 趣味
-
 </button>
 
 <button
 class="menuBtn"
 onclick="toggleTodayItem('👥 地域会合')">
-
 👥 地域会合
-
 </button>
-
-</div>
 
 </div>
 
@@ -492,11 +521,57 @@ class="previewBox">
 
 </div>
 
+<div class="sectionTitle">
+➕ 明日の予定を追加・削除
+</div>
+
+<div class="menuGrid">
+
+<button
+class="menuBtn"
+onclick="toggleTomorrowItem('💼 仕事')">
+💼 仕事
+</button>
+
+<button
+class="menuBtn"
+onclick="toggleTomorrowItem('🏥 病院')">
+🏥 病院
+</button>
+
+<button
+class="menuBtn"
+onclick="toggleTomorrowItem('🛒 買い物')">
+🛒 買い物
+</button>
+
+<button
+class="menuBtn"
+onclick="toggleTomorrowItem('🎈 遊び')">
+🎈 遊び
+</button>
+
+<button
+class="menuBtn"
+onclick="toggleTomorrowItem('🎨 趣味')">
+🎨 趣味
+</button>
+
+<button
+class="menuBtn"
+onclick="toggleTomorrowItem('👥 地域会合')">
+👥 地域会合
+</button>
+
+</div>
+
+</div>
+
 </div>
 
 <!-- メッセージ -->
 
-<div class="card">
+<div class="card fadeIn">
 
 <div class="sectionTitle">
 💌 DayDreamプラス メッセージ
@@ -522,7 +597,7 @@ onclick="readSchedule()">
 
 <!-- 思い出 -->
 
-<div class="card">
+<div class="card fadeIn">
 
 <div class="sectionTitle">
 ✍️ 今日の思い出
@@ -546,25 +621,27 @@ onclick="saveMemo()">
 
 <!-- お薬 -->
 
-<div class="card">
+<div class="card fadeIn">
 
 <div class="sectionTitle">
 💊 お薬チェック
 </div>
+
+<div class="checkArea">
 
 <label>
 <input type="checkbox" id="morning">
 朝
 </label>
 
-<br><br>
+<br>
 
 <label>
 <input type="checkbox" id="noon">
 昼
 </label>
 
-<br><br>
+<br>
 
 <label>
 <input type="checkbox" id="night">
@@ -573,9 +650,11 @@ onclick="saveMemo()">
 
 </div>
 
+</div>
+
 <!-- 文字 -->
 
-<div class="card">
+<div class="card fadeIn">
 
 <div class="sectionTitle">
 🔠 文字サイズ
@@ -601,7 +680,7 @@ onclick="saveMemo()">
 
 <!-- 緊急 -->
 
-<div class="card">
+<div class="card fadeIn">
 
 <div class="sectionTitle">
 🚨 緊急連絡先
@@ -918,6 +997,7 @@ function toggleTodaySchedule(){
   }
 
   showTodaySchedule();
+  showTomorrowPreview();
 
   area.style.display =
   "block";
@@ -980,6 +1060,12 @@ function toggleTodayItem(text){
 
   showTodaySchedule();
 
+  document.getElementById(
+    "todayScheduleArea"
+  ).style.display = "block";
+
+  todayOpen = true;
+
 }
 
 /* 明日予定 */
@@ -1006,6 +1092,37 @@ function showTomorrowPreview(){
     "明日の予定はありません😊";
 
   }
+
+}
+
+function toggleTomorrowItem(text){
+
+  let schedules =
+  JSON.parse(
+    localStorage.getItem(
+      "tomorrowSchedules"
+    ) || "[]"
+  );
+
+  if(schedules.includes(text)){
+
+    schedules =
+    schedules.filter(
+      s => s !== text
+    );
+
+  }else{
+
+    schedules.push(text);
+
+  }
+
+  localStorage.setItem(
+    "tomorrowSchedules",
+    JSON.stringify(schedules)
+  );
+
+  showTomorrowPreview();
 
 }
 
@@ -1136,6 +1253,8 @@ function readSchedule(){
   "ja-JP";
 
   speech.rate = 0.9;
+
+  speechSynthesis.cancel();
 
   speechSynthesis.speak(
     speech
