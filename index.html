@@ -25,7 +25,7 @@ content="yes">
 name="theme-color"
 content="#ffd6ea">
 
-<title>こころ日記 完全版DX+iphone</title>
+<title>こころ日記 完全版DX+ Android版</title>
 
 <style>
 
@@ -231,6 +231,18 @@ textarea{
   resize:none;
 }
 
+.selectBox{
+  width:100%;
+  border:none;
+  border-radius:18px;
+  padding:16px;
+  margin-top:8px;
+  margin-bottom:15px;
+  font-size:1em;
+  background:#f7f7f7;
+  color:#333;
+}
+
 .previewBox{
 
   background:#f7f7f7;
@@ -308,6 +320,33 @@ textarea{
   line-height:2;
 }
 
+.chatUser{
+  background:#eef7ff;
+  padding:14px;
+  border-radius:16px;
+  margin-bottom:10px;
+  line-height:1.8;
+}
+
+.chatMember{
+  background:#fffaf4;
+  padding:14px;
+  border-radius:16px;
+  margin-bottom:14px;
+  line-height:1.8;
+}
+
+.aiBox{
+  background:#f4fff7;
+  padding:12px;
+  border-radius:14px;
+  margin-top:10px;
+}
+
+.memberThinking{
+  opacity:0.9;
+}
+
 @media(max-width:600px){
 
   .menuGrid{
@@ -364,6 +403,22 @@ placeholder="趣味">
 <input
 id="anniversary"
 placeholder="記念日">
+
+<div class="sectionTitle">
+🤖 メッセージ設定
+</div>
+
+<select
+id="aiBlendRate"
+class="selectBox">
+
+<option value="1">AI 1%</option>
+<option value="2">AI 2%</option>
+<option value="3">AI 3%</option>
+<option value="4">AI 4%</option>
+<option value="5">AI 5%</option>
+
+</select>
 
 <div class="sectionTitle">
 🚨 緊急連絡先
@@ -428,6 +483,105 @@ class="small">
 最終更新：--
 
 </div>
+
+</div>
+
+<!-- ユーザー入力 -->
+
+<div class="card">
+
+<div class="sectionTitle">
+💬 メンバーに話しかける
+</div>
+
+<select
+id="talkMember"
+class="selectBox">
+
+<option value="ランダム">🎲 ランダム</option>
+<option value="🌸 悠真">🌸 悠真</option>
+<option value="🎀 葵">🎀 葵</option>
+<option value="🎸 蓮">🎸 蓮</option>
+<option value="🎤 結衣">🎤 結衣</option>
+<option value="🥁 大地">🥁 大地</option>
+
+</select>
+
+<textarea
+id="userMessage"
+maxlength="120"
+placeholder="メンバーに話しかけてみよう😊"></textarea>
+
+<button
+class="mainBtn"
+onclick="sendUserMessage()">
+
+📩 送信する
+
+</button>
+
+</div>
+
+<!-- メンバー回答欄 -->
+
+<div class="card">
+
+<div class="sectionTitle">
+💌 メンバーからのお返事
+</div>
+
+<div
+id="memberReplyArea"
+class="message">
+
+まだメッセージはありません😊
+
+</div>
+
+<div
+id="memberReplyTime"
+class="small">
+
+返信時刻：--
+
+</div>
+
+<button
+class="menuBtn"
+onclick="toggleChatHistoryPage()">
+
+📚 会話履歴ページ
+
+</button>
+
+</div>
+
+<!-- 会話履歴ページ -->
+
+<div
+id="chatHistoryPage"
+class="card"
+style="display:none;">
+
+<div class="sectionTitle">
+📚 会話履歴
+</div>
+
+<div
+id="chatHistoryList"
+class="previewBox">
+
+履歴はまだありません😊
+
+</div>
+
+<button
+class="menuBtn"
+onclick="toggleChatHistoryPage()">
+
+閉じる
+
+</button>
 
 </div>
 
@@ -716,6 +870,7 @@ function saveSettings(){
     birthday:birthday.value,
     hobby:hobby.value,
     anniversary:anniversary.value,
+    aiBlendRate:aiBlendRate.value,
 
     emergency1:emergency1.value,
     emergency2:emergency2.value,
@@ -760,6 +915,9 @@ function loadSettings(){
 
   anniversary.value =
   data.anniversary || "";
+
+  aiBlendRate.value =
+  data.aiBlendRate || "3";
 
   emergency1.value =
   data.emergency1 || "";
@@ -1103,7 +1261,7 @@ localStorage.getItem(
 
 function escapeHtml(text){
 
-  return text
+  return String(text)
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
     .replace(/>/g,"&gt;")
@@ -1384,7 +1542,7 @@ function showEmergencyContacts(){
       margin-bottom:10px;
       ">
 
-      📞 ${value}
+      📞 ${escapeHtml(value)}
 
       </div>
 
@@ -1468,6 +1626,29 @@ const seasonMessages = [
 
 ];
 
+const memberStyles = {
+  "🌸 悠真":{
+    catch:"無理しすぎなくて大丈夫だよ😊",
+    name:"悠真"
+  },
+  "🎀 葵":{
+    catch:"今日もかわいく元気にいこうっ✨",
+    name:"葵"
+  },
+  "🎸 蓮":{
+    catch:"肩の力を抜いていこう👍",
+    name:"蓮"
+  },
+  "🎤 結衣":{
+    catch:"ちゃんと見てるよ、えらいね🌸",
+    name:"結衣"
+  },
+  "🥁 大地":{
+    catch:"よし、今日も一歩ずついこう！",
+    name:"大地"
+  }
+};
+
 function randomItem(arr){
 
   return arr[
@@ -1510,6 +1691,424 @@ setInterval(
   generateMessage,
   30000
 );
+
+/* 会話機能 */
+
+function getSettingsData(){
+  return JSON.parse(
+    localStorage.getItem("kokoroSettings") || "{}"
+  );
+}
+
+function getAiBlendRate(){
+  const settings = getSettingsData();
+  const rate = Number(settings.aiBlendRate || 3);
+  return Math.min(5, Math.max(1, rate));
+}
+
+function chooseMember(selected){
+
+  if(
+    selected &&
+    selected !== "ランダム"
+  ){
+    return selected;
+  }
+
+  return randomItem(members);
+
+}
+
+function getUserCallName(){
+
+  const settings =
+  getSettingsData();
+
+  return settings.name
+  ? `${settings.name}さん`
+  : "あなた";
+
+}
+
+function getKeywordReply(member, text){
+
+  const t =
+  (text || "").trim();
+
+  if(!t){
+    return "";
+  }
+
+  if(
+    t.includes("疲") ||
+    t.includes("しんど") ||
+    t.includes("つら") ||
+    t.includes("苦しい")
+  ){
+    return `${member}「今日はがんばりすぎないでね。少し休憩しよう🌿」`;
+  }
+
+  if(
+    t.includes("嬉") ||
+    t.includes("楽") ||
+    t.includes("最高") ||
+    t.includes("よかった")
+  ){
+    return `${member}「それはすごくいいね😊 その気持ち大事にしよう✨」`;
+  }
+
+  if(
+    t.includes("仕事") ||
+    t.includes("学校") ||
+    t.includes("勉強") ||
+    t.includes("バイト")
+  ){
+    return `${member}「ちゃんと向き合っていてえらいよ。終わったらゆっくりしようね☕」`;
+  }
+
+  if(
+    t.includes("眠") ||
+    t.includes("夜") ||
+    t.includes("寝")
+  ){
+    return `${member}「今日はあたたかくして、ゆっくり休もうね🌙」`;
+  }
+
+  if(
+    t.includes("病院") ||
+    t.includes("体調") ||
+    t.includes("薬")
+  ){
+    return `${member}「無理せず、体をいちばん大事にしてね💊」`;
+  }
+
+  if(
+    t.includes("ありがとう") ||
+    t.includes("助かった")
+  ){
+    return `${member}「こちらこそ、話してくれてありがとう🌸」`;
+  }
+
+  if(
+    t.includes("不安") ||
+    t.includes("心配")
+  ){
+    return `${member}「不安なときは、一つずつゆっくりで大丈夫だよ🌷」`;
+  }
+
+  return "";
+
+}
+
+function createBaseReply(member, userText){
+
+  const callName =
+  getUserCallName();
+
+  const keywordReply =
+  getKeywordReply(member, userText);
+
+  const timeLine =
+  randomItem(timeMessages);
+
+  const seasonLine =
+  randomItem(seasonMessages);
+
+  const greetLine =
+  randomItem(greetings);
+
+  const catchLine =
+  memberStyles[member]
+  ? memberStyles[member].catch
+  : "ゆっくりで大丈夫だよ😊";
+
+  if(keywordReply){
+
+    return `
+      ${member}より💌
+      <br><br>
+      ${callName}、メッセージありがとう😊
+      <br><br>
+      ${keywordReply}
+      <br><br>
+      ${timeLine}
+      <br><br>
+      ${catchLine}
+    `;
+
+  }
+
+  return `
+    ${member}より💌
+    <br><br>
+    ${callName}、話しかけてくれてありがとう😊
+    <br><br>
+    「${greetLine}」
+    <br><br>
+    「${timeLine}」
+    <br><br>
+    「${seasonLine}」
+    <br><br>
+    ${catchLine}
+  `;
+
+}
+
+/* 1〜5% AI混合ロジック
+   現在は安全な疑似AI文を追加する方式
+   将来は fetchAiReply() に置き換え可能 */
+
+function createPseudoAiLine(member, userText){
+
+  const softIdeas = [
+
+    "そういう気持ちを言葉にできた時点で、もう一歩進めていると思うよ。",
+    "今日のあなたの気持ちは、ちゃんと大切にしていいものだよ。",
+    "急がなくても大丈夫。今のペースにも意味があるからね。",
+    "少しだけ深呼吸して、自分にやさしくしてあげてね。",
+    "どんな日でも、あなたらしさはちゃんと輝いているよ。",
+    "小さな前進でも、それは立派な一歩だよ。",
+    "今ここまで来ていること自体、ちゃんと頑張っている証拠だよ。"
+
+  ];
+
+  if(
+    userText &&
+    userText.trim()
+  ){
+    return `${member} AIひとこと✨「${randomItem(softIdeas)}」`;
+  }
+
+  return `${member} AIひとこと✨「${randomItem(softIdeas)}」`;
+
+}
+
+/*
+async function fetchAiReply(member, userText){
+
+  const res = await fetch("/api/member-reply",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      member:member,
+      userText:userText,
+      userName:getUserCallName()
+    })
+  });
+
+  const data = await res.json();
+
+  return data.reply || "";
+
+}
+*/
+
+async function buildHybridReply(member, userText){
+
+  const baseReply =
+  createBaseReply(member, userText);
+
+  const aiRate =
+  getAiBlendRate() / 100;
+
+  const useAi =
+  Math.random() < aiRate;
+
+  if(!useAi){
+    return baseReply;
+  }
+
+  const aiLine =
+  createPseudoAiLine(member, userText);
+
+  return `
+    ${baseReply}
+    <br><br>
+    <div class="aiBox">
+      ${aiLine}
+    </div>
+  `;
+
+}
+
+function getNowText(){
+  return formatDateTime(
+    new Date()
+  );
+}
+
+function saveChatHistory(userText, member, replyHtml){
+
+  let history =
+  JSON.parse(
+    localStorage.getItem("chatHistory") || "[]"
+  );
+
+  history.unshift({
+    userText:userText,
+    member:member,
+    replyHtml:replyHtml,
+    savedAt:getNowText()
+  });
+
+  if(history.length > 100){
+    history = history.slice(0,100);
+  }
+
+  localStorage.setItem(
+    "chatHistory",
+    JSON.stringify(history)
+  );
+
+}
+
+function renderChatHistory(){
+
+  const history =
+  JSON.parse(
+    localStorage.getItem("chatHistory") || "[]"
+  );
+
+  chatHistoryList.innerHTML =
+  history.length
+  ?
+  history.map(item => `
+    <div class="chatUser">
+      <div class="small">🕒 ${item.savedAt}</div>
+      <div>あなた：${escapeHtml(item.userText)}</div>
+    </div>
+    <div class="chatMember">
+      <div>${item.replyHtml}</div>
+    </div>
+  `).join("")
+  :
+  "履歴はまだありません😊";
+
+}
+
+function toggleChatHistoryPage(){
+
+  if(
+    chatHistoryPage.style.display === "none"
+    ||
+    chatHistoryPage.style.display === ""
+  ){
+
+    renderChatHistory();
+
+    chatHistoryPage.style.display =
+    "block";
+
+    chatHistoryPage.scrollIntoView({
+      behavior:"smooth"
+    });
+
+  }else{
+
+    chatHistoryPage.style.display =
+    "none";
+
+  }
+
+}
+
+function saveLatestReply(replyHtml){
+
+  localStorage.setItem(
+    "latestMemberReply",
+    replyHtml
+  );
+
+  localStorage.setItem(
+    "latestMemberReplyTime",
+    getNowText()
+  );
+
+}
+
+function loadLatestReply(){
+
+  const reply =
+  localStorage.getItem(
+    "latestMemberReply"
+  );
+
+  const savedTime =
+  localStorage.getItem(
+    "latestMemberReplyTime"
+  );
+
+  if(reply){
+    memberReplyArea.innerHTML = reply;
+  }
+
+  if(savedTime){
+    memberReplyTime.innerHTML =
+    "返信時刻：" + savedTime;
+  }
+
+}
+
+async function sendUserMessage(){
+
+  const userText =
+  userMessage.value.trim();
+
+  if(!userText){
+    alert("メッセージを入力してください😊");
+    return;
+  }
+
+  const selected =
+  talkMember.value;
+
+  const member =
+  chooseMember(selected);
+
+  memberReplyArea.innerHTML =
+  `<div class="memberThinking">${member} が考え中です…💭</div>`;
+
+  const replyHtml =
+  await buildHybridReply(member, userText);
+
+  memberReplyArea.innerHTML =
+  replyHtml;
+
+  memberReplyTime.innerHTML =
+  "返信時刻：" + getNowText();
+
+  saveChatHistory(
+    userText,
+    member,
+    replyHtml
+  );
+
+  saveLatestReply(replyHtml);
+
+  userMessage.value = "";
+
+}
+
+/* Enter送信補助 */
+
+userMessage.addEventListener(
+  "keydown",
+  function(e){
+
+    if(
+      e.key === "Enter" &&
+      !e.shiftKey
+    ){
+      e.preventDefault();
+      sendUserMessage();
+    }
+
+  }
+);
+
+loadLatestReply();
 
 /* 振動 */
 
