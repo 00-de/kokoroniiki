@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>健康アプリ ホームDX+</title>
+<title>健康アプリ</title>
 
 <style>
 :root{
@@ -14,14 +14,18 @@
 }
 body{
   margin:0;
-  font-family: sans-serif;
-  background: linear-gradient(135deg,var(--bg1),var(--bg2));
+  font-family:sans-serif;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
   color:var(--text);
 }
 .header{
-  padding:20px;
+  padding:20px 20px 10px;
   text-align:center;
   font-weight:bold;
+}
+.appTitle{
+  font-size:32px;
+  margin-bottom:8px;
 }
 .big{
   font-size:28px;
@@ -52,24 +56,33 @@ input,select{
   border:1px solid #ccc;
   width:100%;
   margin-top:5px;
+  box-sizing:border-box;
 }
 .flex{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
 }
-
 #settingsPanel{
   display:none;
+}
+#weatherMeta{
+  margin-top:8px;
+  color:#555;
+  font-size:0.9em;
 }
 </style>
 </head>
 <body>
 
-<div class="header big" id="dateTime"></div>
+<div class="header">
+  <div class="appTitle">健康アプリ</div>
+  <div class="big" id="dateTime"></div>
+</div>
 
 <div class="card">
   <div id="weather">天気読み込み中...</div>
+  <div id="weatherMeta"></div>
 </div>
 
 <div class="card">
@@ -96,6 +109,7 @@ input,select{
   <button onclick="changeFont('medium')">中</button>
   <button onclick="changeFont('big')">大</button>
   <button onclick="toggleSettings()">⚙️設定</button>
+  <button onclick="loadWeather(true)">📍GPSで天気更新</button>
 </div>
 
 <div class="card" id="settingsPanel">
@@ -103,7 +117,7 @@ input,select{
   <label>名前/あだ名</label>
   <input id="name" />
 
-  <label>市町村</label>
+  <label>市町村（GPS失敗時の予備）</label>
   <input id="city" />
 
   <label>誕生日</label>
@@ -133,29 +147,33 @@ function load(key,def){
 
 // ===== 時間 =====
 function updateTime(){
-  const now=new Date();
-  const jp = new Intl.DateTimeFormat('ja-JP',{dateStyle:'full',timeStyle:'short'}).format(now);
-  document.getElementById('dateTime').innerText="令和表示: "+jp;
+  const now = new Date();
+  const jp = new Intl.DateTimeFormat('ja-JP',{
+    dateStyle:'full',
+    timeStyle:'short',
+    timeZone:'Asia/Tokyo'
+  }).format(now);
+  document.getElementById('dateTime').innerText = jp;
 }
 setInterval(updateTime,1000);
 updateTime();
 
 // ===== 薬 =====
 function takeMed(){
-  const today=new Date().toDateString();
+  const today = new Date().toDateString();
   save('med',today);
-  document.getElementById('medStatus').innerText="✔ 今日の薬OK";
+  document.getElementById('medStatus').innerText = '✔ 今日の薬OK';
 }
 (function(){
   if(load('med')===new Date().toDateString()){
-    document.getElementById('medStatus').innerText="✔ 今日の薬OK";
+    document.getElementById('medStatus').innerText = '✔ 今日の薬OK';
   }
 })();
 
 // ===== 気分 =====
-document.getElementById('mood').onchange=()=>{
+document.getElementById('mood').onchange = ()=>{
   save('mood',document.getElementById('mood').value);
-}
+};
 (function(){
   const savedMood = load('mood','😊 いい感じ');
   document.getElementById('mood').value = savedMood;
@@ -167,10 +185,12 @@ let weatherContext = {
   tmax: null,
   tmin: null,
   rain: null,
-  weatherType: 'default'
+  weatherType: 'default',
+  source: 'fallback'
 };
 let weatherLinkedMsgs = [];
 let memberMsgTimer = null;
+let weatherRefreshTimer = null;
 const MEMBER_MSG_INTERVAL = 4 * 60 * 60 * 1000; // 4時間
 
 function detectWeatherType(tmax, rain){
@@ -312,13 +332,18 @@ function showMsg(forceNew=false){
 
   save('memberMsgUsedIndexes',usedIndexes);
   save('memberMsgLastShownAt',Date.now());
-  save('memberMsgText', weatherLinkedMsgs[index]);
+  save('memberMsgText',weatherLinkedMsgs[index]);
   document.getElementById('memberMsg').innerText = weatherLinkedMsgs[index];
 }
 
 function scheduleMemberMessages(){
   if(memberMsgTimer) clearInterval(memberMsgTimer);
   memberMsgTimer = setInterval(()=>showMsg(true), MEMBER_MSG_INTERVAL);
+}
+
+function scheduleWeatherRefresh(){
+  if(weatherRefreshTimer) clearInterval(weatherRefreshTimer);
+  weatherRefreshTimer = setInterval(()=>loadWeather(true), MEMBER_MSG_INTERVAL);
 }
 
 function refreshWeatherLinkedMessages(){
@@ -343,18 +368,18 @@ function refreshWeatherLinkedMessages(){
 
 // ===== フォント =====
 function changeFont(size){
-  document.body.className=size;
+  document.body.className = size;
   save('font',size);
 }
 (function(){
-  const f=load('font','medium');
+  const f = load('font','medium');
   changeFont(f);
 })();
 
 // ===== 設定 =====
 function toggleSettings(){
-  const el=document.getElementById('settingsPanel');
-  el.style.display = el.style.display==='block'?'none':'block';
+  const el = document.getElementById('settingsPanel');
+  el.style.display = el.style.display==='block' ? 'none' : 'block';
 }
 
 function saveSettings(){
@@ -363,55 +388,105 @@ function saveSettings(){
   save('birthday',birthday.value);
   save('hobby',hobby.value);
   save('anniv',anniv.value);
-  alert("保存したよ✨");
-  loadWeather();
+  alert('保存したよ✨');
+  loadWeather(true);
 }
 
 function loadSettings(){
-  name.value=load('name','');
-  city.value=load('city','Tokyo');
-  birthday.value=load('birthday','');
-  hobby.value=load('hobby','');
-  anniv.value=load('anniv','');
+  name.value = load('name','');
+  city.value = load('city','Tokyo');
+  birthday.value = load('birthday','');
+  hobby.value = load('hobby','');
+  anniv.value = load('anniv','');
 }
 
-// ===== 天気（簡易Open-Meteo） =====
-async function loadWeather(){
-  const city=load('city','Tokyo');
+async function reverseGeocode(lat, lon){
   try{
-    const geo=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}`);
-    const g=await geo.json();
-    if(!g.results || !g.results.length){
-      document.getElementById('weather').innerText="地域が見つかりません";
-      weatherContext = { city, tmax:null, tmin:null, rain:null, weatherType:'default' };
-      refreshWeatherLinkedMessages();
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=ja`);
+    const data = await res.json();
+    if(data && data.results && data.results.length){
+      return data.results[0].name || '現在地';
+    }
+  }catch(e){}
+  return '現在地';
+}
+
+async function fetchWeatherByCoords(lat, lon, label='現在地', source='gps'){
+  const w = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&current=temperature_2m&timezone=Asia%2FTokyo`);
+  const d = await w.json();
+
+  const tmax = d.daily.temperature_2m_max[0];
+  const tmin = d.daily.temperature_2m_min[0];
+  const rain = d.daily.precipitation_probability_max[0];
+  const nowTemp = d.current?.temperature_2m;
+  const weatherType = detectWeatherType(tmax, rain);
+
+  weatherContext = { city: label, tmax, tmin, rain, weatherType, source };
+
+  document.getElementById('weather').innerHTML =
+    `🌤 ${label}<br>現在:${nowTemp ?? '-'}℃ / 最高:${tmax}℃ 最低:${tmin}℃ 降水:${rain}%`;
+  document.getElementById('weatherMeta').innerText = source === 'gps'
+    ? '取得元: GPS現在地'
+    : '取得元: 設定した市町村';
+
+  refreshWeatherLinkedMessages();
+}
+
+async function fetchWeatherByCity(city){
+  const geo = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&language=ja`);
+  const g = await geo.json();
+  if(!g.results || !g.results.length){
+    throw new Error('city_not_found');
+  }
+  const {latitude, longitude, name} = g.results[0];
+  await fetchWeatherByCoords(latitude, longitude, name || city, 'fallback');
+}
+
+function getCurrentPositionAsync(options={}){
+  return new Promise((resolve, reject)=>{
+    if(!navigator.geolocation){
+      reject(new Error('geolocation_not_supported'));
       return;
     }
-    const {latitude,longitude}=g.results[0];
+    navigator.geolocation.getCurrentPosition(resolve, reject, options);
+  });
+}
 
-    const w=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo`);
-    const d=await w.json();
+// ===== 天気（GPS優先 / 失敗時は市町村） =====
+async function loadWeather(useGps=true){
+  const fallbackCity = load('city','Tokyo');
+  document.getElementById('weather').innerText = '天気読み込み中...';
+  document.getElementById('weatherMeta').innerText = '';
 
-    const tmax=d.daily.temperature_2m_max[0];
-    const tmin=d.daily.temperature_2m_min[0];
-    const rain=d.daily.precipitation_probability_max[0];
-    const weatherType = detectWeatherType(tmax, rain);
-
-    weatherContext = { city, tmax, tmin, rain, weatherType };
-
-    document.getElementById('weather').innerHTML =
-      `🌤 ${city}<br>最高:${tmax}℃ 最低:${tmin}℃ 降水:${rain}%`;
-
-    refreshWeatherLinkedMessages();
+  try{
+    if(useGps){
+      const pos = await getCurrentPositionAsync({
+        enableHighAccuracy:true,
+        timeout:10000,
+        maximumAge:30*60*1000
+      });
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      const placeName = await reverseGeocode(lat, lon);
+      await fetchWeatherByCoords(lat, lon, placeName, 'gps');
+      return;
+    }
+    await fetchWeatherByCity(fallbackCity);
   }catch(e){
-    document.getElementById('weather').innerText="天気取得失敗";
-    weatherContext = { city, tmax:null, tmin:null, rain:null, weatherType:'default' };
-    refreshWeatherLinkedMessages();
+    try{
+      await fetchWeatherByCity(fallbackCity);
+    }catch(err){
+      document.getElementById('weather').innerText = '天気取得失敗';
+      document.getElementById('weatherMeta').innerText = 'GPSと市町村取得の両方に失敗しました';
+      weatherContext = { city: fallbackCity, tmax:null, tmin:null, rain:null, weatherType:'default', source:'fallback' };
+      refreshWeatherLinkedMessages();
+    }
   }
 }
 
 loadSettings();
-loadWeather();
+loadWeather(true);
+scheduleWeatherRefresh();
 </script>
 
 </body>
