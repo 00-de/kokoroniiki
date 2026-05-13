@@ -1,2138 +1,417 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-
-<meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="
-width=device-width,
-initial-scale=1.0,
-viewport-fit=cover,
-user-scalable=no
-">
-
-<meta
-name="apple-mobile-web-app-capable"
-content="yes">
-
-<meta
-name="mobile-web-app-capable"
-content="yes">
-
-<meta
-name="theme-color"
-content="#ffd6ea">
-
-<title>こころ日記 完全版DX+ iphone版</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>健康アプリ ホームDX+</title>
 
 <style>
-
 :root{
-  --baseFont:24px;
+  --bg1:#ffe1f5;
+  --bg2:#d7f0ff;
+  --card:#ffffffcc;
+  --text:#222;
 }
-
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-
-html{
-  scroll-behavior:smooth;
-}
-
 body{
-
   margin:0;
-
-  padding:
-  env(safe-area-inset-top)
-  16px
-  env(safe-area-inset-bottom)
-  16px;
-
-  min-height:100vh;
-
-  font-family:
-  -apple-system,
-  BlinkMacSystemFont,
-  sans-serif;
-
-  font-size:var(--baseFont);
-
-  color:#333;
-
-  transition:0.5s;
-
-  overflow-x:hidden;
-
+  font-family: sans-serif;
+  background: linear-gradient(135deg,var(--bg1),var(--bg2));
+  color:var(--text);
 }
-
-/* 季節背景 */
-
-.spring{
-  background:
-  linear-gradient(
-    135deg,
-    #ffe3ef,
-    #fff8fb
-  );
-}
-
-.summer{
-  background:
-  linear-gradient(
-    135deg,
-    #d9f6ff,
-    #f0fcff
-  );
-}
-
-.autumn{
-  background:
-  linear-gradient(
-    135deg,
-    #ffe0c1,
-    #fff5e9
-  );
-}
-
-.winter{
-  background:
-  linear-gradient(
-    135deg,
-    #edf5ff,
-    #fafcff
-  );
-}
-
-.container{
-  max-width:760px;
-  margin:auto;
-}
-
-.title{
-
+.header{
+  padding:20px;
   text-align:center;
-
-  font-size:2em;
-
   font-weight:bold;
-
-  color:#ff77aa;
-
-  margin-bottom:20px;
 }
-
-.card{
-
-  background:white;
-
-  border-radius:28px;
-
-  padding:22px;
-
-  margin-bottom:20px;
-
-  box-shadow:
-  0 8px 20px
-  rgba(0,0,0,0.08);
-}
-
-.sectionTitle{
-
-  font-size:1.2em;
-
-  font-weight:bold;
-
-  color:#ff77aa;
-
-  margin-bottom:14px;
-}
-
 .big{
-  font-size:1.4em;
-  font-weight:bold;
-  line-height:1.7;
+  font-size:28px;
 }
-
-.time{
-  font-size:1.2em;
-  margin-top:10px;
+.medium{
+  font-size:20px;
 }
-
-button{
-
-  width:100%;
-
-  border:none;
-
-  border-radius:22px;
-
-  padding:18px;
-
-  margin:6px 0;
-
-  min-height:72px;
-
-  font-size:1em;
-
-  font-weight:bold;
-
-  cursor:pointer;
-
-  transition:0.2s;
-}
-
-button:active{
-  transform:scale(0.98);
-}
-
-.mainBtn{
-  background:#7dbef5;
-  color:white;
-}
-
-.menuBtn{
-  background:#ffe0ec;
-}
-
-.voice{
-  background:#c9f7db;
-}
-
-.emergency{
-  background:#ff8f8f;
-  color:white;
-}
-
-textarea,
-input{
-
-  width:100%;
-
-  border:none;
-
-  border-radius:18px;
-
-  padding:16px;
-
-  margin-top:8px;
-  margin-bottom:15px;
-
-  font-size:1em;
-
-  background:#f7f7f7;
-}
-
-textarea{
-  height:110px;
-  resize:none;
-}
-
-.selectBox{
-  width:100%;
-  border:none;
-  border-radius:18px;
-  padding:16px;
-  margin-top:8px;
-  margin-bottom:15px;
-  font-size:1em;
-  background:#f7f7f7;
-  color:#333;
-}
-
-.previewBox{
-
-  background:#f7f7f7;
-
-  padding:18px;
-
-  border-radius:18px;
-
-  line-height:1.8;
-
-  margin-top:15px;
-}
-
-.settingPanel{
-
-  max-height:0;
-
-  overflow:hidden;
-
-  opacity:0;
-
-  transition:
-  max-height 0.5s ease,
-  opacity 0.4s ease;
-
-}
-
-.settingPanel.show{
-
-  max-height:5000px;
-
-  opacity:1;
-
-  margin-top:15px;
-}
-
-.message{
-
-  background:#fff4c8;
-
-  border-radius:18px;
-
-  padding:18px;
-
-  line-height:1.9;
-}
-
-.weatherBox{
-  line-height:1.9;
-}
-
 .small{
-  font-size:0.8em;
-  color:#666;
+  font-size:16px;
 }
-
-.menuGrid{
-
-  display:grid;
-
-  grid-template-columns:
-  1fr 1fr;
-
+.card{
+  margin:15px;
+  padding:15px;
+  background:var(--card);
+  border-radius:16px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+button{
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  margin:5px;
+  cursor:pointer;
+}
+input,select{
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  width:100%;
+  margin-top:5px;
+}
+.flex{
+  display:flex;
   gap:10px;
+  flex-wrap:wrap;
 }
 
-.checkArea{
-
-  background:#f7f7f7;
-
-  padding:16px;
-
-  border-radius:18px;
-
-  line-height:2;
+#settingsPanel{
+  display:none;
 }
-
-.chatUser{
-  background:#eef7ff;
-  padding:14px;
-  border-radius:16px;
-  margin-bottom:10px;
-  line-height:1.8;
-}
-
-.chatMember{
-  background:#fffaf4;
-  padding:14px;
-  border-radius:16px;
-  margin-bottom:14px;
-  line-height:1.8;
-}
-
-.aiBox{
-  background:#f4fff7;
-  padding:12px;
-  border-radius:14px;
-  margin-top:10px;
-}
-
-.memberThinking{
-  opacity:0.9;
-}
-
-@media(max-width:600px){
-
-  .menuGrid{
-    grid-template-columns:1fr;
-  }
-
-}
-
 </style>
 </head>
-
 <body>
 
-<div class="container">
-
-<div class="title">
-🌸 こころ日記 🌸
-</div>
-
-<!-- 設定 -->
-
-<button
-class="mainBtn"
-onclick="toggleSettings()">
-
-⚙️ 設定画面
-
-</button>
-
-<div
-id="settings"
-class="card settingPanel">
-
-<div class="sectionTitle">
-⚙️ ユーザー設定
-</div>
-
-<input
-id="userName"
-placeholder="名前・あだ名">
-
-<input
-id="userCity"
-placeholder="住んでいる地域">
-
-<input
-type="date"
-id="birthday">
-
-<input
-id="hobby"
-placeholder="趣味">
-
-<input
-id="anniversary"
-placeholder="記念日">
-
-<div class="sectionTitle">
-🤖 メッセージ設定
-</div>
-
-<select
-id="aiBlendRate"
-class="selectBox">
-
-<option value="1">AI 1%</option>
-<option value="2">AI 2%</option>
-<option value="3">AI 3%</option>
-<option value="4">AI 4%</option>
-<option value="5">AI 5%</option>
-
-</select>
-
-<div class="sectionTitle">
-🚨 緊急連絡先
-</div>
-
-<input
-id="emergency1"
-placeholder="① 名前・電話番号">
-
-<input
-id="emergency2"
-placeholder="② 名前・電話番号">
-
-<input
-id="emergency3"
-placeholder="③ 名前・電話番号">
-
-<input
-id="emergency4"
-placeholder="④ 名前・電話番号">
-
-<input
-id="emergency5"
-placeholder="⑤ 名前・電話番号">
-
-<button
-class="mainBtn"
-onclick="saveSettings()">
-
-💾 保存
-
-</button>
-
-</div>
-
-<!-- 日時 -->
+<div class="header big" id="dateTime"></div>
 
 <div class="card">
-
-<div
-id="date"
-class="big">
+  <div id="weather">天気読み込み中...</div>
 </div>
-
-<div
-id="time"
-class="time">
-</div>
-
-<div
-id="weather"
-class="weatherBox">
-
-☁️ 天気取得中...
-
-</div>
-
-<div
-id="weatherUpdate"
-class="small">
-
-最終更新：--
-
-</div>
-
-</div>
-
-<!-- ユーザー入力 -->
 
 <div class="card">
-
-<div class="sectionTitle">
-💬 メンバーに話しかける
+  <button onclick="takeMed()">💊 薬飲んだ</button>
+  <div id="medStatus"></div>
 </div>
-
-<select
-id="talkMember"
-class="selectBox">
-
-<option value="ランダム">🎲 ランダム</option>
-<option value="🌸 悠真">🌸 悠真</option>
-<option value="🎀 葵">🎀 葵</option>
-<option value="🎸 蓮">🎸 蓮</option>
-<option value="🎤 結衣">🎤 結衣</option>
-<option value="🥁 大地">🥁 大地</option>
-
-</select>
-
-<textarea
-id="userMessage"
-maxlength="120"
-placeholder="メンバーに話しかけてみよう😊"></textarea>
-
-<button
-class="mainBtn"
-onclick="sendUserMessage()">
-
-📩 送信する
-
-</button>
-
-</div>
-
-<!-- メンバー回答欄 -->
 
 <div class="card">
-
-<div class="sectionTitle">
-💌 メンバーからのお返事
+  今日の気分
+  <select id="mood">
+    <option>😊 いい感じ</option>
+    <option>🙂 普通</option>
+    <option>😐 まあまあ</option>
+    <option>😢 悪い</option>
+  </select>
 </div>
-
-<div
-id="memberReplyArea"
-class="message">
-
-まだメッセージはありません😊
-
-</div>
-
-<div
-id="memberReplyTime"
-class="small">
-
-返信時刻：--
-
-</div>
-
-<button
-class="menuBtn"
-onclick="toggleChatHistoryPage()">
-
-📚 会話履歴ページ
-
-</button>
-
-</div>
-
-<!-- 会話履歴ページ -->
-
-<div
-id="chatHistoryPage"
-class="card"
-style="display:none;">
-
-<div class="sectionTitle">
-📚 会話履歴
-</div>
-
-<div
-id="chatHistoryList"
-class="previewBox">
-
-履歴はまだありません😊
-
-</div>
-
-<button
-class="menuBtn"
-onclick="toggleChatHistoryPage()">
-
-閉じる
-
-</button>
-
-</div>
-
-<!-- 今日予定 -->
 
 <div class="card">
-
-<div class="sectionTitle">
-🗓️ 今日の予定
+  <div id="memberMsg"></div>
 </div>
 
-<div
-id="todaySchedule"
-class="previewBox">
-
-予定はありません😊
-
+<div class="card flex">
+  <button onclick="changeFont('small')">小</button>
+  <button onclick="changeFont('medium')">中</button>
+  <button onclick="changeFont('big')">大</button>
+  <button onclick="toggleSettings()">⚙️設定</button>
 </div>
 
-<div class="menuGrid">
+<div class="card" id="settingsPanel">
+  <h3>設定</h3>
+  <label>名前/あだ名</label>
+  <input id="name" />
 
-<button
-class="menuBtn"
-onclick="toggleTodayItem('💼 仕事')">
-💼 仕事
-</button>
+  <label>市町村</label>
+  <input id="city" />
 
-<button
-class="menuBtn"
-onclick="toggleTodayItem('🏥 病院')">
-🏥 病院
-</button>
+  <label>誕生日</label>
+  <input id="birthday" type="date" />
 
-<button
-class="menuBtn"
-onclick="toggleTodayItem('🛒 買い物')">
-🛒 買い物
-</button>
+  <label>趣味</label>
+  <input id="hobby" />
 
-<button
-class="menuBtn"
-onclick="toggleTodayItem('🎈 遊び')">
-🎈 遊び
-</button>
+  <label>記念日</label>
+  <input id="anniv" type="date" />
 
-<button
-class="menuBtn"
-onclick="toggleTodayItem('🎨 趣味')">
-🎨 趣味
-</button>
-
-<button
-class="menuBtn"
-onclick="toggleTodayItem('👥 地域会合')">
-👥 地域会合
-</button>
-
-</div>
-
-</div>
-
-<!-- 明日 -->
-
-<div class="card">
-
-<div class="sectionTitle">
-📅 明日の予定
-</div>
-
-<div
-id="tomorrowPreview"
-class="previewBox">
-
-明日の予定はありません😊
-
-</div>
-
-<div class="menuGrid">
-
-<button
-class="menuBtn"
-onclick="toggleTomorrowItem('💼 仕事')">
-💼 仕事
-</button>
-
-<button
-class="menuBtn"
-onclick="toggleTomorrowItem('🏥 病院')">
-🏥 病院
-</button>
-
-<button
-class="menuBtn"
-onclick="toggleTomorrowItem('🛒 買い物')">
-🛒 買い物
-</button>
-
-<button
-class="menuBtn"
-onclick="toggleTomorrowItem('🎈 遊び')">
-🎈 遊び
-</button>
-
-<button
-class="menuBtn"
-onclick="toggleTomorrowItem('🎨 趣味')">
-🎨 趣味
-</button>
-
-<button
-class="menuBtn"
-onclick="toggleTomorrowItem('👥 地域会合')">
-👥 地域会合
-</button>
-
-</div>
-
-</div>
-
-<!-- DayDream -->
-
-<div class="card">
-
-<div class="sectionTitle">
-💌 DayDreamプラス メッセージ
-</div>
-
-<div
-id="messageArea"
-class="message">
-
-読み込み中...
-
-</div>
-
-<button
-class="voice"
-onclick="readSchedule()">
-
-🔊 今日の予定を読み上げ
-
-</button>
-
-</div>
-
-<!-- メモ -->
-
-<div class="card">
-
-<div class="sectionTitle">
-✍️ 今日の思い出
-</div>
-
-<textarea
-id="memo"
-maxlength="50"
-placeholder="50文字以内"></textarea>
-
-<button
-class="mainBtn"
-onclick="saveMemo()">
-
-💾 保存
-
-</button>
-
-<button
-class="menuBtn"
-onclick="toggleMemoHistoryPage()">
-
-📚 思い出履歴ページ
-
-</button>
-
-</div>
-
-<!-- 思い出履歴ページ -->
-
-<div
-id="memoHistoryPage"
-class="card"
-style="display:none;">
-
-<div class="sectionTitle">
-📚 思い出履歴
-</div>
-
-<div
-id="memoHistoryList"
-class="previewBox">
-
-履歴はまだありません😊
-
-</div>
-
-<button
-class="menuBtn"
-onclick="toggleMemoHistoryPage()">
-
-閉じる
-
-</button>
-
-</div>
-
-<!-- お薬 -->
-
-<div class="card">
-
-<div class="sectionTitle">
-💊 お薬チェック
-</div>
-
-<div class="checkArea">
-
-<label>
-<input type="checkbox" id="morning">
-朝
-</label>
-
-<br>
-
-<label>
-<input type="checkbox" id="noon">
-昼
-</label>
-
-<br>
-
-<label>
-<input type="checkbox" id="night">
-夜
-</label>
-
-</div>
-
-</div>
-
-<!-- 緊急 -->
-
-<div class="card">
-
-<div class="sectionTitle">
-🚨 緊急連絡先
-</div>
-
-<button
-class="emergency"
-onclick="showEmergencyContacts()">
-
-📞 緊急連絡先を見る
-
-</button>
-
-<div
-id="emergencyList"
-class="previewBox"
-style="display:none;">
-
-未設定です😊
-
-</div>
-
-</div>
-
+  <button onclick="saveSettings()">保存</button>
 </div>
 
 <script>
+// ===== 永続化 =====
+function save(key,val){localStorage.setItem(key,JSON.stringify(val));}
+function load(key,def){
+  const raw = localStorage.getItem(key);
+  if(raw===null) return def;
+  try{
+    return JSON.parse(raw);
+  }catch(e){
+    return def;
+  }
+}
 
-/* 設定 */
+// ===== 時間 =====
+function updateTime(){
+  const now=new Date();
+  const jp = new Intl.DateTimeFormat('ja-JP',{dateStyle:'full',timeStyle:'short'}).format(now);
+  document.getElementById('dateTime').innerText="令和表示: "+jp;
+}
+setInterval(updateTime,1000);
+updateTime();
 
+// ===== 薬 =====
+function takeMed(){
+  const today=new Date().toDateString();
+  save('med',today);
+  document.getElementById('medStatus').innerText="✔ 今日の薬OK";
+}
+(function(){
+  if(load('med')===new Date().toDateString()){
+    document.getElementById('medStatus').innerText="✔ 今日の薬OK";
+  }
+})();
+
+// ===== 気分 =====
+document.getElementById('mood').onchange=()=>{
+  save('mood',document.getElementById('mood').value);
+}
+(function(){
+  const savedMood = load('mood','😊 いい感じ');
+  document.getElementById('mood').value = savedMood;
+})();
+
+// ===== 天気連動メッセージ用状態 =====
+let weatherContext = {
+  city: load('city','Tokyo'),
+  tmax: null,
+  tmin: null,
+  rain: null,
+  weatherType: 'default'
+};
+let weatherLinkedMsgs = [];
+let memberMsgTimer = null;
+const MEMBER_MSG_INTERVAL = 4 * 60 * 60 * 1000; // 4時間
+
+function detectWeatherType(tmax, rain){
+  if(rain >= 70) return 'rainy';
+  if(tmax >= 30) return 'hot';
+  if(tmax <= 10) return 'cold';
+  return 'mild';
+}
+
+function buildWeatherLead(ctx){
+  switch(ctx.weatherType){
+    case 'rainy': return '今日は雨に備えつつ';
+    case 'hot': return '今日は暑さに気をつけながら';
+    case 'cold': return '今日は冷えに気をつけながら';
+    case 'mild': return '今日は過ごしやすい空気を感じつつ';
+    default: return '今日の空気に合わせて';
+  }
+}
+
+function generateWeatherLinkedMessages(ctx){
+  const displayName = load('name','').trim() || 'あなた';
+  const hobby = load('hobby','').trim();
+  const city = ctx.city || load('city','Tokyo');
+  const hobbyText = hobby ? `、${hobby}も少し楽しみつつ` : '';
+  const weatherLead = buildWeatherLead(ctx);
+  const tempText = (ctx.tmax !== null && ctx.tmin !== null)
+    ? `最高${ctx.tmax}℃・最低${ctx.tmin}℃`
+    : '今日の体調第一で';
+  const rainText = (ctx.rain !== null)
+    ? `降水${ctx.rain}%`
+    : '空模様を見ながら';
+
+  const intros = [
+    `${displayName}さん、`,`${displayName}さんなら、`,`今日は${displayName}さんのペースで、`,`焦らず${displayName}さんらしく、`,`ひとつずつ${displayName}さんの歩幅で、`,
+    `${city}の空気を感じながら、`,`今日もやさしく、`,`大丈夫、`,`今のままで十分、`,`深呼吸してから、`,
+    `朝でも昼でも夜でも、`,`無理を増やさず、`,`気楽に、`,`落ち着いて、`,`少しずつ、`,
+    `丁寧に、`,`やさしく、`,`ゆったり、`,`自然体で、`,`自分を大切にしながら、`,
+    `今日も一歩、`,`心と体をいたわりながら、`,`自分のリズムで、`,`安心して、`,`穏やかな気持ちで、`
+  ];
+
+  const supports = [
+    `${weatherLead}過ごしていきましょう`,
+    `${tempText}だからこそ休憩も大切です`,
+    `${rainText}なので予定はゆるめでも大丈夫です`,
+    `${city}の今日に合う落ち着いた行動がぴったりです`,
+    `水分補給を忘れずにいきましょう`,
+    `肩の力を抜いて進めば十分です`,
+    `急がなくてもちゃんと前に進めています`,
+    `体調を優先するのがいちばんです`,
+    `できたことをひとつ見つけるだけで十分です`,
+    `今日は小さな達成感を大事にしましょう`,
+    `無理をしない判断も立派な前進です`,
+    `休む勇気もいい選択です`,
+    `深呼吸ひとつで流れが変わります`,
+    `背すじを少し伸ばすだけでも気分は整います`,
+    `今の調子に合わせて動けば大丈夫です`,
+    `自分を責めずにいきましょう`,
+    `ゆっくりでも続けることが力になります`,
+    `今日のペースは今日の正解です`,
+    `落ち着いて進めばちゃんと整っていきます`,
+    `ひと息入れながらで十分です`,
+    `笑顔になれる瞬間をひとつ探してみましょう`,
+    `できないことよりできたことに目を向けましょう`,
+    `今の自分をそのまま認めてあげましょう`,
+    `心配しすぎず目の前の一歩で大丈夫です`,
+    `外の空気を少し吸うだけでも気分転換になります`
+  ];
+
+  const actions = [
+    `薬チェックも忘れずに`,
+    `温かい飲み物でひと息ついて`,
+    `こまめに座り直して姿勢を楽にして`,
+    `窓辺で空を見て気分転換して`,
+    `軽くストレッチして`,
+    `予定をひとつだけ進めて`,
+    `できたことをメモして`,
+    `好きな音楽で気持ちを整えて`,
+    `朝昼夜のリズムを意識して`,
+    `無理のない範囲で体を動かして`
+  ];
+
+  const closers = [
+    `応援しています✨`,
+    `いい流れでいけます🌿`,
+    `そのままで十分です🌈`,
+    `今日も大丈夫です☀️`,
+    `やさしく進めばOKです🍀`,
+    `ちゃんと積み重なっています💪`,
+    `安心していきましょう😊`,
+    `落ち着いていけばうまくいきます✨`,
+    `無理せずいきましょう🌸`,
+    `いい一日になりますように🌟`
+  ];
+
+  const result = [];
+  for (const intro of intros) {
+    for (const support of supports) {
+      for (const action of actions) {
+        for (const closer of closers) {
+          const message = `${intro}${support}${hobbyText}。${action}。${closer}`
+            .replace(/、、/g,'、')
+            .replace(/。+/g,'。')
+            .replace(/\s+/g,' ')
+            .trim();
+          result.push(message);
+          if (result.length === 5000) return result;
+        }
+      }
+    }
+  }
+  return result;
+}
+
+function showMsg(forceNew=false){
+  if(!weatherLinkedMsgs.length){
+    weatherLinkedMsgs = generateWeatherLinkedMessages(weatherContext);
+  }
+
+  const savedText = load('memberMsgText','');
+  if(!forceNew && savedText){
+    document.getElementById('memberMsg').innerText = savedText;
+    return;
+  }
+
+  let usedIndexes = load('memberMsgUsedIndexes',[]);
+  if(forceNew && usedIndexes.length >= weatherLinkedMsgs.length){
+    usedIndexes = [];
+  }
+
+  let index;
+  do{
+    index = Math.floor(Math.random()*weatherLinkedMsgs.length);
+  }while(weatherLinkedMsgs.length > 1 && usedIndexes.includes(index));
+
+  usedIndexes.push(index);
+  if(usedIndexes.length > weatherLinkedMsgs.length){
+    usedIndexes = [index];
+  }
+
+  save('memberMsgUsedIndexes',usedIndexes);
+  save('memberMsgLastShownAt',Date.now());
+  save('memberMsgText', weatherLinkedMsgs[index]);
+  document.getElementById('memberMsg').innerText = weatherLinkedMsgs[index];
+}
+
+function scheduleMemberMessages(){
+  if(memberMsgTimer) clearInterval(memberMsgTimer);
+  memberMsgTimer = setInterval(()=>showMsg(true), MEMBER_MSG_INTERVAL);
+}
+
+function refreshWeatherLinkedMessages(){
+  weatherLinkedMsgs = generateWeatherLinkedMessages(weatherContext);
+  save('memberMessageCount', weatherLinkedMsgs.length);
+  showMsg(true);
+  scheduleMemberMessages();
+}
+
+(function initializeMemberMessage(){
+  const lastShownAt = load('memberMsgLastShownAt',0);
+  const now = Date.now();
+  const savedText = load('memberMsgText','');
+
+  if(!savedText || now - lastShownAt >= MEMBER_MSG_INTERVAL){
+    refreshWeatherLinkedMessages();
+  }else{
+    document.getElementById('memberMsg').innerText = savedText;
+    scheduleMemberMessages();
+  }
+})();
+
+// ===== フォント =====
+function changeFont(size){
+  document.body.className=size;
+  save('font',size);
+}
+(function(){
+  const f=load('font','medium');
+  changeFont(f);
+})();
+
+// ===== 設定 =====
 function toggleSettings(){
-
-  settings.classList.toggle(
-    "show"
-  );
-
+  const el=document.getElementById('settingsPanel');
+  el.style.display = el.style.display==='block'?'none':'block';
 }
 
 function saveSettings(){
-
-  const data = {
-
-    name:userName.value,
-    city:userCity.value,
-    birthday:birthday.value,
-    hobby:hobby.value,
-    anniversary:anniversary.value,
-    aiBlendRate:aiBlendRate.value,
-
-    emergency1:emergency1.value,
-    emergency2:emergency2.value,
-    emergency3:emergency3.value,
-    emergency4:emergency4.value,
-    emergency5:emergency5.value
-
-  };
-
-  localStorage.setItem(
-    "kokoroSettings",
-    JSON.stringify(data)
-  );
-
-  alert("保存しました😊");
-
+  save('name',name.value);
+  save('city',city.value);
+  save('birthday',birthday.value);
+  save('hobby',hobby.value);
+  save('anniv',anniv.value);
+  alert("保存したよ✨");
+  loadWeather();
 }
 
 function loadSettings(){
+  name.value=load('name','');
+  city.value=load('city','Tokyo');
+  birthday.value=load('birthday','');
+  hobby.value=load('hobby','');
+  anniv.value=load('anniv','');
+}
 
-  const data =
+// ===== 天気（簡易Open-Meteo） =====
+async function loadWeather(){
+  const city=load('city','Tokyo');
+  try{
+    const geo=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}`);
+    const g=await geo.json();
+    if(!g.results || !g.results.length){
+      document.getElementById('weather').innerText="地域が見つかりません";
+      weatherContext = { city, tmax:null, tmin:null, rain:null, weatherType:'default' };
+      refreshWeatherLinkedMessages();
+      return;
+    }
+    const {latitude,longitude}=g.results[0];
 
-  JSON.parse(
+    const w=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo`);
+    const d=await w.json();
 
-    localStorage.getItem(
-      "kokoroSettings"
-    ) || "{}"
+    const tmax=d.daily.temperature_2m_max[0];
+    const tmin=d.daily.temperature_2m_min[0];
+    const rain=d.daily.precipitation_probability_max[0];
+    const weatherType = detectWeatherType(tmax, rain);
 
-  );
+    weatherContext = { city, tmax, tmin, rain, weatherType };
 
-  userName.value =
-  data.name || "";
+    document.getElementById('weather').innerHTML =
+      `🌤 ${city}<br>最高:${tmax}℃ 最低:${tmin}℃ 降水:${rain}%`;
 
-  userCity.value =
-  data.city || "";
-
-  birthday.value =
-  data.birthday || "";
-
-  hobby.value =
-  data.hobby || "";
-
-  anniversary.value =
-  data.anniversary || "";
-
-  aiBlendRate.value =
-  data.aiBlendRate || "3";
-
-  emergency1.value =
-  data.emergency1 || "";
-
-  emergency2.value =
-  data.emergency2 || "";
-
-  emergency3.value =
-  data.emergency3 || "";
-
-  emergency4.value =
-  data.emergency4 || "";
-
-  emergency5.value =
-  data.emergency5 || "";
-
+    refreshWeatherLinkedMessages();
+  }catch(e){
+    document.getElementById('weather').innerText="天気取得失敗";
+    weatherContext = { city, tmax:null, tmin:null, rain:null, weatherType:'default' };
+    refreshWeatherLinkedMessages();
+  }
 }
 
 loadSettings();
-
-/* 日時 */
-
-function updateDateTime(){
-
-  const now =
-  new Date();
-
-  const week = [
-
-    "日曜日",
-    "月曜日",
-    "火曜日",
-    "水曜日",
-    "木曜日",
-    "金曜日",
-    "土曜日"
-
-  ];
-
-  let hour =
-  now.getHours();
-
-  const minute =
-  String(
-    now.getMinutes()
-  ).padStart(2,"0");
-
-  const ampm =
-  hour >= 12
-  ? "午後"
-  : "午前";
-
-  hour =
-  hour % 12;
-
-  if(hour === 0){
-    hour = 12;
-  }
-
-  date.innerHTML =
-
-  `📅 ${now.getFullYear()}年
-  ${now.getMonth()+1}月
-  ${now.getDate()}日
-  ${week[now.getDay()]}`;
-
-  time.innerHTML =
-  `🕒 ${ampm}${hour}時${minute}分`;
-
-}
-
-setInterval(
-  updateDateTime,
-  1000
-);
-
-updateDateTime();
-
-/* 季節背景 */
-
-function setSeason(){
-
-  const month =
-  new Date().getMonth()+1;
-
-  document.body.className="";
-
-  if(month>=3 && month<=5){
-
-    document.body.classList.add(
-      "spring"
-    );
-
-  }else if(month>=6 && month<=8){
-
-    document.body.classList.add(
-      "summer"
-    );
-
-  }else if(month>=9 && month<=11){
-
-    document.body.classList.add(
-      "autumn"
-    );
-
-  }else{
-
-    document.body.classList.add(
-      "winter"
-    );
-
-  }
-
-}
-
-setSeason();
-
-/* 天気 */
-
-function translateWeather(text){
-
-  const map = {
-
-    "Sunny":"晴れ ☀️",
-    "Clear":"快晴 ☀️",
-    "Partly cloudy":"くもり時々晴れ ⛅",
-    "Cloudy":"くもり ☁️",
-    "Overcast":"厚いくもり ☁️",
-    "Mist":"霧 🌫️",
-    "Patchy rain nearby":"近くで雨 ☔",
-    "Light rain":"小雨 ☔",
-    "Moderate rain":"雨 ☔",
-    "Heavy rain":"大雨 ☔",
-    "Light snow":"小雪 ❄️",
-    "Heavy snow":"大雪 ❄️"
-
-  };
-
-  return map[text] || text;
-
-}
-
-async function getWeather(){
-
-  try{
-
-    const res =
-    await fetch(
-      "https://wttr.in/?format=j1"
-    );
-
-    const data =
-    await res.json();
-
-    const current =
-    data.current_condition[0];
-
-    const today =
-    data.weather[0];
-
-    weather.innerHTML = `
-
-    ⛅ ${
-      translateWeather(
-        current.weatherDesc[0].value
-      )
-    }
-
-    <br><br>
-
-    🌡️ 現在：
-    ${current.temp_C}℃
-
-    <br><br>
-
-    🔥 最高気温：
-    ${today.maxtempC}℃
-
-    <br><br>
-
-    ❄️ 最低気温：
-    ${today.mintempC}℃
-
-    `;
-
-    weatherUpdate.innerHTML =
-    "最終更新：" +
-    new Date().toLocaleTimeString(
-      "ja-JP"
-    );
-
-  }catch(e){
-
-    weather.innerHTML =
-    "⚠️ 天気取得失敗";
-
-  }
-
-}
-
-getWeather();
-
-/* 今日予定 */
-
-function showTodaySchedule(){
-
-  const today =
-
-  JSON.parse(
-
-    localStorage.getItem(
-      "todaySchedules"
-    ) || "[]"
-
-  );
-
-  todaySchedule.innerHTML =
-
-  today.length
-
-  ?
-
-  today.map(s =>
-    `・${s}`
-  ).join("<br>")
-
-  :
-
-  "予定はありません😊";
-
-}
-
-function toggleTodayItem(text){
-
-  let schedules =
-
-  JSON.parse(
-
-    localStorage.getItem(
-      "todaySchedules"
-    ) || "[]"
-
-  );
-
-  if(schedules.includes(text)){
-
-    schedules =
-    schedules.filter(
-      s => s !== text
-    );
-
-  }else{
-
-    schedules.push(text);
-
-  }
-
-  localStorage.setItem(
-    "todaySchedules",
-    JSON.stringify(schedules)
-  );
-
-  showTodaySchedule();
-
-}
-
-showTodaySchedule();
-
-/* 明日 */
-
-function showTomorrowPreview(){
-
-  const tomorrow =
-
-  JSON.parse(
-
-    localStorage.getItem(
-      "tomorrowSchedules"
-    ) || "[]"
-
-  );
-
-  tomorrowPreview.innerHTML =
-
-  tomorrow.length
-
-  ?
-
-  tomorrow.map(s =>
-    `・${s}`
-  ).join("<br>")
-
-  :
-
-  "明日の予定はありません😊";
-
-}
-
-function toggleTomorrowItem(text){
-
-  let schedules =
-
-  JSON.parse(
-
-    localStorage.getItem(
-      "tomorrowSchedules"
-    ) || "[]"
-
-  );
-
-  if(schedules.includes(text)){
-
-    schedules =
-    schedules.filter(
-      s => s !== text
-    );
-
-  }else{
-
-    schedules.push(text);
-
-  }
-
-  localStorage.setItem(
-    "tomorrowSchedules",
-    JSON.stringify(schedules)
-  );
-
-  showTomorrowPreview();
-
-}
-
-showTomorrowPreview();
-
-/* メモ */
-
-memo.value =
-localStorage.getItem(
-  "memo"
-) || "";
-
-function escapeHtml(text){
-
-  return String(text)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#39;");
-
-}
-
-function formatDateTime(date){
-
-  const y = date.getFullYear();
-  const m = String(date.getMonth()+1).padStart(2,"0");
-  const d = String(date.getDate()).padStart(2,"0");
-  const h = String(date.getHours()).padStart(2,"0");
-  const min = String(date.getMinutes()).padStart(2,"0");
-
-  return `${y}/${m}/${d} ${h}:${min}`;
-
-}
-
-function renderMemoHistory(){
-
-  const history =
-
-  JSON.parse(
-
-    localStorage.getItem(
-      "memoHistory"
-    ) || "[]"
-
-  );
-
-  memoHistoryList.innerHTML =
-
-  history.length
-
-  ?
-
-  history.map(item => `
-
-    <div style="
-    background:#fffafc;
-    padding:14px;
-    border-radius:16px;
-    margin-bottom:12px;
-    ">
-
-    <div class="small">
-    🕒 ${item.savedAt}
-    </div>
-
-    <div style="
-    margin-top:8px;
-    line-height:1.8;
-    ">
-    ${escapeHtml(item.text)}
-    </div>
-
-    </div>
-
-  `).join("")
-
-  :
-
-  "履歴はまだありません😊";
-
-}
-
-function toggleMemoHistoryPage(){
-
-  if(
-    memoHistoryPage.style.display === "none"
-    ||
-    memoHistoryPage.style.display === ""
-  ){
-
-    renderMemoHistory();
-
-    memoHistoryPage.style.display =
-    "block";
-
-    memoHistoryPage.scrollIntoView({
-      behavior:"smooth"
-    });
-
-  }else{
-
-    memoHistoryPage.style.display =
-    "none";
-
-  }
-
-}
-
-function saveMemo(){
-
-  localStorage.setItem(
-    "memo",
-    memo.value
-  );
-
-  const text =
-  memo.value.trim();
-
-  if(text){
-
-    let history =
-
-    JSON.parse(
-
-      localStorage.getItem(
-        "memoHistory"
-      ) || "[]"
-
-    );
-
-    history.unshift({
-      text:text,
-      savedAt:formatDateTime(
-        new Date()
-      )
-    });
-
-    if(history.length > 100){
-      history = history.slice(0,100);
-    }
-
-    localStorage.setItem(
-      "memoHistory",
-      JSON.stringify(history)
-    );
-
-  }
-
-  renderMemoHistory();
-
-  alert("保存しました😊");
-
-}
-
-/* お薬 */
-
-function saveMedicine(){
-
-  const data = {
-
-    morning:
-    morning.checked,
-
-    noon:
-    noon.checked,
-
-    night:
-    night.checked
-
-  };
-
-  localStorage.setItem(
-    "medicine",
-    JSON.stringify(data)
-  );
-
-}
-
-function loadMedicine(){
-
-  const data =
-
-  JSON.parse(
-
-    localStorage.getItem(
-      "medicine"
-    ) || "{}"
-
-  );
-
-  morning.checked =
-  data.morning || false;
-
-  noon.checked =
-  data.noon || false;
-
-  night.checked =
-  data.night || false;
-
-}
-
-loadMedicine();
-
-document
-.querySelectorAll(
-  "input[type='checkbox']"
-)
-.forEach(el => {
-
-  el.addEventListener(
-    "change",
-    saveMedicine
-  );
-
-});
-
-/* 音声 */
-
-function readSchedule(){
-
-  const schedules =
-
-  JSON.parse(
-
-    localStorage.getItem(
-      "todaySchedules"
-    ) || "[]"
-
-  );
-
-  let text =
-
-  schedules.length
-
-  ?
-
-  "今日の予定を読み上げます。" +
-  schedules.join("。")
-
-  :
-
-  "今日の予定はありません";
-
-  const speech =
-  new SpeechSynthesisUtterance(
-    text
-  );
-
-  speech.lang = "ja-JP";
-
-  speech.rate = 0.9;
-
-  speechSynthesis.cancel();
-
-  speechSynthesis.speak(
-    speech
-  );
-
-}
-
-/* 緊急 */
-
-let emergencyOpen = false;
-
-function showEmergencyContacts(){
-
-  const data =
-
-  JSON.parse(
-
-    localStorage.getItem(
-      "kokoroSettings"
-    ) || "{}"
-
-  );
-
-  let html = "";
-
-  for(let i=1;i<=5;i++){
-
-    const value =
-    data["emergency"+i];
-
-    if(value){
-
-      html += `
-
-      <div style="
-      background:#fff4c8;
-      padding:14px;
-      border-radius:16px;
-      margin-bottom:10px;
-      ">
-
-      📞 ${escapeHtml(value)}
-
-      </div>
-
-      `;
-
-    }
-
-  }
-
-  if(html===""){
-
-    html="未設定です😊";
-
-  }
-
-  if(emergencyOpen){
-
-    emergencyList.style.display =
-    "none";
-
-    emergencyOpen = false;
-
-    return;
-
-  }
-
-  emergencyList.innerHTML =
-  html;
-
-  emergencyList.style.display =
-  "block";
-
-  emergencyOpen = true;
-
-}
-
-/* DayDream */
-
-const members = [
-
-"🌸 悠真",
-"🎀 葵",
-"🎸 蓮",
-"🎤 結衣",
-"🥁 大地"
-
-];
-
-const greetings = [
-
-"今日もゆっくりいこう😊",
-"無理しすぎないでね✨",
-"ちゃんと休憩も大事だよ☕",
-"今日も応援してるよ🌈",
-"マイペースで大丈夫🌸",
-"頑張っててえらいよ✨",
-"少しずつで大丈夫😊",
-"いっぱい応援してるよ🎶",
-"焦らなくて大丈夫🌸",
-"今日はいい日になるよ☀️"
-
-];
-
-const timeMessages = [
-
-"朝はゆっくりスタート☀️",
-"お昼も無理しないでね🍙",
-"夜はゆっくり休もう🌙",
-"深夜は暖かくしてね✨",
-"水分補給忘れずに🥤"
-
-];
-
-const seasonMessages = [
-
-"春の空気気持ちいいね🌸",
-"夏バテ気をつけてね☀️",
-"秋の景色綺麗だね🍁",
-"冬は暖かくしてね❄️",
-"今日の空も綺麗だね☁️"
-
-];
-
-const memberStyles = {
-  "🌸 悠真":{
-    catch:"無理しすぎなくて大丈夫だよ😊",
-    name:"悠真"
-  },
-  "🎀 葵":{
-    catch:"今日もかわいく元気にいこうっ✨",
-    name:"葵"
-  },
-  "🎸 蓮":{
-    catch:"肩の力を抜いていこう👍",
-    name:"蓮"
-  },
-  "🎤 結衣":{
-    catch:"ちゃんと見てるよ、えらいね🌸",
-    name:"結衣"
-  },
-  "🥁 大地":{
-    catch:"よし、今日も一歩ずついこう！",
-    name:"大地"
-  }
-};
-
-function randomItem(arr){
-
-  return arr[
-    Math.floor(
-      Math.random()
-      * arr.length
-    )
-  ];
-
-}
-
-function generateMessage(){
-
-  const message = `
-
-  ${randomItem(members)}より💌
-
-  <br><br>
-
-  ${randomItem(greetings)}
-
-  <br><br>
-
-  ${randomItem(timeMessages)}
-
-  <br><br>
-
-  ${randomItem(seasonMessages)}
-
-  `;
-
-  messageArea.innerHTML =
-  message;
-
-}
-
-generateMessage();
-
-setInterval(
-  generateMessage,
-  30000
-);
-
-/* 会話機能 */
-
-function getSettingsData(){
-  return JSON.parse(
-    localStorage.getItem("kokoroSettings") || "{}"
-  );
-}
-
-function getAiBlendRate(){
-  const settings = getSettingsData();
-  const rate = Number(settings.aiBlendRate || 3);
-  return Math.min(5, Math.max(1, rate));
-}
-
-function chooseMember(selected){
-
-  if(
-    selected &&
-    selected !== "ランダム"
-  ){
-    return selected;
-  }
-
-  return randomItem(members);
-
-}
-
-function getUserCallName(){
-
-  const settings =
-  getSettingsData();
-
-  return settings.name
-  ? `${settings.name}さん`
-  : "あなた";
-
-}
-
-function getKeywordReply(member, text){
-
-  const t =
-  (text || "").trim();
-
-  if(!t){
-    return "";
-  }
-
-  if(
-    t.includes("疲") ||
-    t.includes("しんど") ||
-    t.includes("つら") ||
-    t.includes("苦しい")
-  ){
-    return `${member}「今日はがんばりすぎないでね。少し休憩しよう🌿」`;
-  }
-
-  if(
-    t.includes("嬉") ||
-    t.includes("楽") ||
-    t.includes("最高") ||
-    t.includes("よかった")
-  ){
-    return `${member}「それはすごくいいね😊 その気持ち大事にしよう✨」`;
-  }
-
-  if(
-    t.includes("仕事") ||
-    t.includes("学校") ||
-    t.includes("勉強") ||
-    t.includes("バイト")
-  ){
-    return `${member}「ちゃんと向き合っていてえらいよ。終わったらゆっくりしようね☕」`;
-  }
-
-  if(
-    t.includes("眠") ||
-    t.includes("夜") ||
-    t.includes("寝")
-  ){
-    return `${member}「今日はあたたかくして、ゆっくり休もうね🌙」`;
-  }
-
-  if(
-    t.includes("病院") ||
-    t.includes("体調") ||
-    t.includes("薬")
-  ){
-    return `${member}「無理せず、体をいちばん大事にしてね💊」`;
-  }
-
-  if(
-    t.includes("ありがとう") ||
-    t.includes("助かった")
-  ){
-    return `${member}「こちらこそ、話してくれてありがとう🌸」`;
-  }
-
-  if(
-    t.includes("不安") ||
-    t.includes("心配")
-  ){
-    return `${member}「不安なときは、一つずつゆっくりで大丈夫だよ🌷」`;
-  }
-
-  return "";
-
-}
-
-function createBaseReply(member, userText){
-
-  const callName =
-  getUserCallName();
-
-  const keywordReply =
-  getKeywordReply(member, userText);
-
-  const timeLine =
-  randomItem(timeMessages);
-
-  const seasonLine =
-  randomItem(seasonMessages);
-
-  const greetLine =
-  randomItem(greetings);
-
-  const catchLine =
-  memberStyles[member]
-  ? memberStyles[member].catch
-  : "ゆっくりで大丈夫だよ😊";
-
-  if(keywordReply){
-
-    return `
-      ${member}より💌
-      <br><br>
-      ${callName}、メッセージありがとう😊
-      <br><br>
-      ${keywordReply}
-      <br><br>
-      ${timeLine}
-      <br><br>
-      ${catchLine}
-    `;
-
-  }
-
-  return `
-    ${member}より💌
-    <br><br>
-    ${callName}、話しかけてくれてありがとう😊
-    <br><br>
-    「${greetLine}」
-    <br><br>
-    「${timeLine}」
-    <br><br>
-    「${seasonLine}」
-    <br><br>
-    ${catchLine}
-  `;
-
-}
-
-/* 1〜5% AI混合ロジック
-   現在は安全な疑似AI文を追加する方式
-   将来は fetchAiReply() に置き換え可能 */
-
-function createPseudoAiLine(member, userText){
-
-  const softIdeas = [
-
-    "そういう気持ちを言葉にできた時点で、もう一歩進めていると思うよ。",
-    "今日のあなたの気持ちは、ちゃんと大切にしていいものだよ。",
-    "急がなくても大丈夫。今のペースにも意味があるからね。",
-    "少しだけ深呼吸して、自分にやさしくしてあげてね。",
-    "どんな日でも、あなたらしさはちゃんと輝いているよ。",
-    "小さな前進でも、それは立派な一歩だよ。",
-    "今ここまで来ていること自体、ちゃんと頑張っている証拠だよ。"
-
-  ];
-
-  if(
-    userText &&
-    userText.trim()
-  ){
-    return `${member} AIひとこと✨「${randomItem(softIdeas)}」`;
-  }
-
-  return `${member} AIひとこと✨「${randomItem(softIdeas)}」`;
-
-}
-
-/*
-async function fetchAiReply(member, userText){
-
-  const res = await fetch("/api/member-reply",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-      member:member,
-      userText:userText,
-      userName:getUserCallName()
-    })
-  });
-
-  const data = await res.json();
-
-  return data.reply || "";
-
-}
-*/
-
-async function buildHybridReply(member, userText){
-
-  const baseReply =
-  createBaseReply(member, userText);
-
-  const aiRate =
-  getAiBlendRate() / 100;
-
-  const useAi =
-  Math.random() < aiRate;
-
-  if(!useAi){
-    return baseReply;
-  }
-
-  const aiLine =
-  createPseudoAiLine(member, userText);
-
-  return `
-    ${baseReply}
-    <br><br>
-    <div class="aiBox">
-      ${aiLine}
-    </div>
-  `;
-
-}
-
-function getNowText(){
-  return formatDateTime(
-    new Date()
-  );
-}
-
-function saveChatHistory(userText, member, replyHtml){
-
-  let history =
-  JSON.parse(
-    localStorage.getItem("chatHistory") || "[]"
-  );
-
-  history.unshift({
-    userText:userText,
-    member:member,
-    replyHtml:replyHtml,
-    savedAt:getNowText()
-  });
-
-  if(history.length > 100){
-    history = history.slice(0,100);
-  }
-
-  localStorage.setItem(
-    "chatHistory",
-    JSON.stringify(history)
-  );
-
-}
-
-function renderChatHistory(){
-
-  const history =
-  JSON.parse(
-    localStorage.getItem("chatHistory") || "[]"
-  );
-
-  chatHistoryList.innerHTML =
-  history.length
-  ?
-  history.map(item => `
-    <div class="chatUser">
-      <div class="small">🕒 ${item.savedAt}</div>
-      <div>あなた：${escapeHtml(item.userText)}</div>
-    </div>
-    <div class="chatMember">
-      <div>${item.replyHtml}</div>
-    </div>
-  `).join("")
-  :
-  "履歴はまだありません😊";
-
-}
-
-function toggleChatHistoryPage(){
-
-  if(
-    chatHistoryPage.style.display === "none"
-    ||
-    chatHistoryPage.style.display === ""
-  ){
-
-    renderChatHistory();
-
-    chatHistoryPage.style.display =
-    "block";
-
-    chatHistoryPage.scrollIntoView({
-      behavior:"smooth"
-    });
-
-  }else{
-
-    chatHistoryPage.style.display =
-    "none";
-
-  }
-
-}
-
-function saveLatestReply(replyHtml){
-
-  localStorage.setItem(
-    "latestMemberReply",
-    replyHtml
-  );
-
-  localStorage.setItem(
-    "latestMemberReplyTime",
-    getNowText()
-  );
-
-}
-
-function loadLatestReply(){
-
-  const reply =
-  localStorage.getItem(
-    "latestMemberReply"
-  );
-
-  const savedTime =
-  localStorage.getItem(
-    "latestMemberReplyTime"
-  );
-
-  if(reply){
-    memberReplyArea.innerHTML = reply;
-  }
-
-  if(savedTime){
-    memberReplyTime.innerHTML =
-    "返信時刻：" + savedTime;
-  }
-
-}
-
-async function sendUserMessage(){
-
-  const userText =
-  userMessage.value.trim();
-
-  if(!userText){
-    alert("メッセージを入力してください😊");
-    return;
-  }
-
-  const selected =
-  talkMember.value;
-
-  const member =
-  chooseMember(selected);
-
-  memberReplyArea.innerHTML =
-  `<div class="memberThinking">${member} が考え中です…💭</div>`;
-
-  const replyHtml =
-  await buildHybridReply(member, userText);
-
-  memberReplyArea.innerHTML =
-  replyHtml;
-
-  memberReplyTime.innerHTML =
-  "返信時刻：" + getNowText();
-
-  saveChatHistory(
-    userText,
-    member,
-    replyHtml
-  );
-
-  saveLatestReply(replyHtml);
-
-  userMessage.value = "";
-
-}
-
-/* Enter送信補助 */
-
-userMessage.addEventListener(
-  "keydown",
-  function(e){
-
-    if(
-      e.key === "Enter" &&
-      !e.shiftKey
-    ){
-      e.preventDefault();
-      sendUserMessage();
-    }
-
-  }
-);
-
-loadLatestReply();
-
-/* 振動 */
-
-function vibratePhone(){
-
-  if(navigator.vibrate){
-
-    navigator.vibrate(40);
-
-  }
-
-}
-
-document
-.querySelectorAll("button")
-.forEach(btn=>{
-
-  btn.addEventListener(
-    "click",
-    vibratePhone
-  );
-
-});
-
+loadWeather();
 </script>
 
 </body>
