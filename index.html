@@ -113,6 +113,7 @@ body{
   font-size:1em;
   background:#ffe1ef;
   color:#444;
+  cursor:pointer;
 }
 
 .btn:active{
@@ -143,6 +144,7 @@ input[type="checkbox"]{
   padding:18px;
   font-size:1em;
   background:#eef4ff;
+  cursor:pointer;
 }
 
 .message{
@@ -170,6 +172,7 @@ input[type="checkbox"]{
   color:white;
   font-size:28px;
   box-shadow:var(--shadow);
+  cursor:pointer;
 }
 
 .modal{
@@ -263,6 +266,7 @@ input,select{
   background:#ffe1ef;
   color:#444;
   font-size:1em;
+  cursor:pointer;
 }
 
 .footerSpace{
@@ -275,22 +279,21 @@ input,select{
 
 <div class="card">
   <div class="title">🌸 DayDreamプラス Life</div>
-
   <div class="bigDate" id="date"></div>
-
   <div class="time" id="time"></div>
 </div>
 
 <div class="card weather">
 
-  <div class="weatherIcon">☀️</div>
+  <div class="weatherIcon" id="weatherIcon">📍</div>
 
   <div id="weatherText">
-    静岡県 ○○市<br>
-    晴れ<br>
-    最高24℃ / 最低15℃<br>
-    降水確率20%
+    現在地の天気を取得しています...
   </div>
+
+  <button class="btn" onclick="loadWeatherByGPS()">
+    現在地の天気を再取得
+  </button>
 
 </div>
 
@@ -605,12 +608,12 @@ function loadSettings(){
 
   });
 
+  const savedAnniversary = localStorage.getItem("anniversary");
+
   document.getElementById("anniversaryText").innerHTML =
-  "🎉 " +
-  (
-    localStorage.getItem("anniversary")
-    || "記念日を設定してください✨"
-  );
+  savedAnniversary
+  ? "🎉 " + savedAnniversary
+  : "記念日を設定してください✨";
 
 }
 
@@ -628,9 +631,7 @@ const savedFont =
 localStorage.getItem("fontSize");
 
 if(savedFont){
-
   setFont(savedFont);
-
 }
 
 let calendarDate = new Date(
@@ -680,6 +681,181 @@ function changeMonth(step){
 }
 
 renderCalendar();
+
+function weatherCodeToJapanese(code){
+
+  const map = {
+    0: { text:"快晴", icon:"☀️" },
+    1: { text:"晴れ", icon:"🌤️" },
+    2: { text:"晴れ時々くもり", icon:"⛅" },
+    3: { text:"くもり", icon:"☁️" },
+    45: { text:"霧", icon:"🌫️" },
+    48: { text:"霧", icon:"🌫️" },
+    51: { text:"弱い霧雨", icon:"🌦️" },
+    53: { text:"霧雨", icon:"🌦️" },
+    55: { text:"強い霧雨", icon:"🌧️" },
+    56: { text:"弱い着氷性の霧雨", icon:"🌧️" },
+    57: { text:"強い着氷性の霧雨", icon:"🌧️" },
+    61: { text:"弱い雨", icon:"🌦️" },
+    63: { text:"雨", icon:"🌧️" },
+    65: { text:"強い雨", icon:"🌧️" },
+    66: { text:"弱い着氷性の雨", icon:"🌧️" },
+    67: { text:"強い着氷性の雨", icon:"🌧️" },
+    71: { text:"弱い雪", icon:"❄️" },
+    73: { text:"雪", icon:"❄️" },
+    75: { text:"大雪", icon:"❄️" },
+    77: { text:"雪の粒", icon:"❄️" },
+    80: { text:"にわか雨", icon:"🌦️" },
+    81: { text:"やや強いにわか雨", icon:"🌧️" },
+    82: { text:"激しいにわか雨", icon:"⛈️" },
+    85: { text:"にわか雪", icon:"🌨️" },
+    86: { text:"激しいにわか雪", icon:"🌨️" },
+    95: { text:"雷雨", icon:"⛈️" },
+    96: { text:"ひょうを伴う雷雨", icon:"⛈️" },
+    99: { text:"激しい雷雨", icon:"⛈️" }
+  };
+
+  return map[code] || { text:"天気情報取得", icon:"🌈" };
+}
+
+async function reverseGeocode(lat, lon){
+  try{
+    const url =
+      `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=ja`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if(data && data.results && data.results.length > 0){
+      const place = data.results[0];
+      const admin1 = place.admin1 || "";
+      const name = place.name || "";
+      return `${admin1} ${name}`.trim();
+    }
+  }catch(e){
+  }
+
+  return "現在地";
+}
+
+async function fetchWeather(lat, lon){
+
+  const weatherText = document.getElementById("weatherText");
+  const weatherIcon = document.getElementById("weatherIcon");
+
+  weatherText.innerHTML = "天気情報を取得しています...";
+  weatherIcon.innerHTML = "📡";
+
+  try{
+
+    const placeName = await reverseGeocode(lat, lon);
+
+    const url =
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=1`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const code = data.current.weather_code;
+    const weather = weatherCodeToJapanese(code);
+
+    const currentTemp = Math.round(data.current.temperature_2m);
+    const maxTemp = Math.round(data.daily.temperature_2m_max[0]);
+    const minTemp = Math.round(data.daily.temperature_2m_min[0]);
+    const rain = Math.round(data.daily.precipitation_probability_max[0] ?? 0);
+
+    weatherIcon.innerHTML = weather.icon;
+
+    weatherText.innerHTML =
+      `${placeName}<br>` +
+      `${weather.text}<br>` +
+      `現在 ${currentTemp}℃<br>` +
+      `最高${maxTemp}℃ / 最低${minTemp}℃<br>` +
+      `降水確率${rain}%`;
+
+  }catch(error){
+
+    weatherIcon.innerHTML = "⚠️";
+    weatherText.innerHTML =
+      "天気情報の取得に失敗しました。<br>通信状態を確認してもう一度お試しください。";
+  }
+}
+
+function loadWeatherByGPS(){
+
+  const weatherText = document.getElementById("weatherText");
+  const weatherIcon = document.getElementById("weatherIcon");
+
+  if(!navigator.geolocation){
+    weatherIcon.innerHTML = "⚠️";
+    weatherText.innerHTML =
+      "この端末ではGPSが使えません。";
+    return;
+  }
+
+  if(
+    location.protocol !== "https:" &&
+    location.hostname !== "localhost" &&
+    location.hostname !== "127.0.0.1"
+  ){
+    weatherIcon.innerHTML = "⚠️";
+    weatherText.innerHTML =
+      "GPSはHTTPS環境で動作します。<br>スマホで直接HTMLを開くと位置情報が使えない場合があります。";
+    return;
+  }
+
+  weatherIcon.innerHTML = "📍";
+  weatherText.innerHTML = "現在地を取得しています...";
+
+  navigator.geolocation.getCurrentPosition(
+
+    function(position){
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      localStorage.setItem("lastLat", lat);
+      localStorage.setItem("lastLon", lon);
+
+      fetchWeather(lat, lon);
+    },
+
+    function(error){
+
+      weatherIcon.innerHTML = "⚠️";
+
+      let msg = "GPSの取得に失敗しました。";
+
+      switch(error.code){
+        case error.PERMISSION_DENIED:
+          msg = "位置情報の許可がOFFです。<br>ブラウザの位置情報を許可してください。";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          msg = "現在地を取得できませんでした。<br>電波状況をご確認ください。";
+          break;
+        case error.TIMEOUT:
+          msg = "位置情報の取得がタイムアウトしました。<br>もう一度お試しください。";
+          break;
+      }
+
+      weatherText.innerHTML = msg;
+
+      const lastLat = localStorage.getItem("lastLat");
+      const lastLon = localStorage.getItem("lastLon");
+
+      if(lastLat && lastLon){
+        fetchWeather(lastLat, lastLon);
+      }
+    },
+
+    {
+      enableHighAccuracy:true,
+      timeout:10000,
+      maximumAge:300000
+    }
+  );
+}
+
+loadWeatherByGPS();
 
 </script>
 
