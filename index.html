@@ -96,6 +96,82 @@ body{
   color:var(--accent);
 }
 
+.todayAgendaCard{
+  background:linear-gradient(180deg,#fff0f7,#ffffff);
+  border:2px solid #ffc0da;
+  box-shadow:0 10px 24px rgba(255,127,176,0.16);
+}
+
+.todayAgendaDate{
+  text-align:center;
+  color:#b45c83;
+  font-weight:bold;
+  margin-bottom:12px;
+  line-height:1.6;
+}
+
+.todayAgendaSummary{
+  text-align:center;
+  margin-bottom:14px;
+}
+
+.todayAgendaCount{
+  display:inline-block;
+  padding:8px 14px;
+  border-radius:999px;
+  background:#ff7fb0;
+  color:white;
+  font-weight:bold;
+  font-size:0.92em;
+}
+
+.todayAgendaList{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.todayAgendaEmpty{
+  background:#fff;
+  border-radius:22px;
+  padding:20px;
+  text-align:center;
+  color:#888;
+  line-height:1.8;
+  box-shadow:0 4px 12px rgba(0,0,0,0.05);
+}
+
+.todayAgendaItem{
+  background:#fff;
+  border-radius:22px;
+  padding:16px;
+  box-shadow:0 5px 14px rgba(0,0,0,0.06);
+  border-left:8px solid #ccc;
+}
+
+.todayAgendaTop{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  margin-bottom:8px;
+}
+
+.todayAgendaTitle{
+  font-size:1.02em;
+  font-weight:bold;
+  line-height:1.6;
+  color:#444;
+}
+
+.todayAgendaMemo{
+  margin-top:8px;
+  color:#666;
+  line-height:1.7;
+  font-size:0.9em;
+  white-space:pre-wrap;
+}
+
 .weather{
   text-align:center;
   line-height:1.8;
@@ -119,6 +195,22 @@ body{
 
 .btn:active{
   transform:scale(0.98);
+}
+
+.btnPrimary{
+  background:#ffd4e6;
+  color:#7a3d57;
+  font-weight:bold;
+}
+
+.btnSub{
+  background:#eef4ff;
+  color:#50627c;
+}
+
+.btnDanger{
+  background:#ffe1e1;
+  color:#a14a4a;
 }
 
 .check{
@@ -470,15 +562,40 @@ textarea{
   line-height:1.6;
 }
 
-.deleteSmallBtn{
+.itemActionButtons{
+  display:flex;
+  gap:8px;
+  flex-shrink:0;
+}
+
+.smallBtn{
   border:none;
-  background:#ffe4ec;
-  color:#a44;
   border-radius:12px;
   padding:8px 12px;
   cursor:pointer;
   font-size:0.82em;
   white-space:nowrap;
+}
+
+.editSmallBtn{
+  background:#e8f0ff;
+  color:#41618d;
+}
+
+.deleteSmallBtn{
+  background:#ffe4ec;
+  color:#a44;
+}
+
+.formModeBox{
+  margin-top:8px;
+  margin-bottom:10px;
+  padding:12px 14px;
+  border-radius:16px;
+  background:#fff3f8;
+  color:#a25677;
+  font-weight:bold;
+  line-height:1.6;
 }
 
 .footerSpace{
@@ -493,6 +610,13 @@ textarea{
   <div class="title">🌸 DayDreamプラス Life</div>
   <div class="bigDate" id="date"></div>
   <div class="time" id="time"></div>
+</div>
+
+<div class="card todayAgendaCard">
+  <div class="title">🌟 今日の予定</div>
+  <div class="todayAgendaDate" id="todayAgendaDate"></div>
+  <div class="todayAgendaSummary" id="todayAgendaSummary"></div>
+  <div class="todayAgendaList" id="todayAgendaContent"></div>
 </div>
 
 <div class="card weather">
@@ -528,7 +652,7 @@ textarea{
   <div class="calendarGrid" id="calendar"></div>
 
   <div class="subText">
-    日付をタップすると、その日の予定を複数登録できます✨
+    日付をタップすると、その日の予定を追加・編集・削除できます✨
   </div>
 
 </div>
@@ -627,11 +751,11 @@ textarea{
       <button class="btn" onclick="setFont(34)">最大</button>
     </div>
 
-    <button class="btn" onclick="saveSettings()">
+    <button class="btn btnPrimary" onclick="saveSettings()">
       保存
     </button>
 
-    <button class="btn" onclick="closeSettings()">
+    <button class="btn btnSub" onclick="closeSettings()">
       閉じる
     </button>
 
@@ -641,14 +765,18 @@ textarea{
 <div class="modal" id="scheduleModal">
   <div class="modalContent">
 
-    <div class="title">🗓️ 予定一覧・追加</div>
+    <div class="title">🗓️ 予定一覧・追加・編集</div>
 
     <div class="selectedDateLabel" id="selectedDateLabel"></div>
 
     <div class="sectionLabel">この日の予定</div>
     <div class="scheduleList" id="scheduleList"></div>
 
-    <div class="sectionLabel">新しい予定を追加</div>
+    <div class="sectionLabel" id="formSectionTitle">新しい予定を追加</div>
+
+    <div class="formModeBox" id="formModeBox">
+      追加モードです
+    </div>
 
     <select id="scheduleCategory">
       <option value="病院">病院</option>
@@ -663,11 +791,15 @@ textarea{
 
     <textarea id="scheduleMemo" placeholder="メモ（任意）"></textarea>
 
-    <button class="btn" onclick="addSchedule()">
+    <button class="btn btnPrimary" id="saveScheduleBtn" onclick="saveScheduleForm()">
       予定を追加
     </button>
 
-    <button class="btn" onclick="closeScheduleModal()">
+    <button class="btn btnSub" id="cancelEditBtn" onclick="cancelEditMode()" style="display:none;">
+      編集をやめる
+    </button>
+
+    <button class="btn btnSub" onclick="closeScheduleModal()">
       閉じる
     </button>
 
@@ -882,8 +1014,9 @@ let calendarDate = new Date(
   1
 );
 
-const scheduleStorageKey = "calendarSchedulesV2";
+const scheduleStorageKey = "calendarSchedulesV3";
 let selectedDateKey = "";
+let editingScheduleId = null;
 
 const categoryMeta = {
   "病院": {
@@ -939,64 +1072,42 @@ function normalizeScheduleItem(item){
 
 function loadSchedulesData(){
 
-  try{
-    const raw = localStorage.getItem(scheduleStorageKey);
+  const keysToTry = [
+    "calendarSchedulesV3",
+    "calendarSchedulesV2",
+    "calendarSchedules"
+  ];
 
-    if(raw){
-      const parsed = JSON.parse(raw);
-      const normalized = {};
+  for(const key of keysToTry){
+    try{
+      const raw = localStorage.getItem(key);
 
-      Object.keys(parsed).forEach(dateKey=>{
-        const value = parsed[dateKey];
+      if(raw){
+        const parsed = JSON.parse(raw);
+        const normalized = {};
 
-        if(Array.isArray(value)){
-          normalized[dateKey] =
-            value
-            .map(normalizeScheduleItem)
-            .filter(v=>v.text && v.text.trim());
-        }else if(typeof value === "string" && value.trim()){
-          normalized[dateKey] = [normalizeScheduleItem(value)];
-        }
-      });
+        Object.keys(parsed).forEach(dateKey=>{
+          const value = parsed[dateKey];
 
-      localStorage.setItem(
-        scheduleStorageKey,
-        JSON.stringify(normalized)
-      );
+          if(Array.isArray(value)){
+            normalized[dateKey] =
+              value
+              .map(normalizeScheduleItem)
+              .filter(v=>v.text && v.text.trim());
+          }else if(typeof value === "string" && value.trim()){
+            normalized[dateKey] = [normalizeScheduleItem(value)];
+          }
+        });
 
-      return normalized;
+        localStorage.setItem(
+          scheduleStorageKey,
+          JSON.stringify(normalized)
+        );
+
+        return normalized;
+      }
+    }catch(e){
     }
-  }catch(e){
-  }
-
-  try{
-    const oldRaw = localStorage.getItem("calendarSchedules");
-
-    if(oldRaw){
-      const oldParsed = JSON.parse(oldRaw);
-      const converted = {};
-
-      Object.keys(oldParsed).forEach(dateKey=>{
-        const value = oldParsed[dateKey];
-
-        if(Array.isArray(value)){
-          converted[dateKey] =
-            value
-            .map(normalizeScheduleItem)
-            .filter(v=>v.text && v.text.trim());
-        }else if(typeof value === "string" && value.trim()){
-          converted[dateKey] = [normalizeScheduleItem(value)];
-        }
-      });
-
-      localStorage.setItem(
-        scheduleStorageKey,
-        JSON.stringify(converted)
-      );
-
-      return converted;
-    }
-  }catch(e){
   }
 
   return {};
@@ -1092,11 +1203,101 @@ function getEventsForDate(dateKey){
   return sortEvents(list);
 }
 
+function getTodayDateKey(){
+  const now = new Date();
+  return getDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+function renderTodaySchedule(){
+
+  const now = new Date();
+  const week = ["日","月","火","水","木","金","土"];
+  const todayKey = getTodayDateKey();
+  const events = getEventsForDate(todayKey);
+
+  document.getElementById("todayAgendaDate").innerHTML =
+    `${now.getMonth()+1}月${now.getDate()}日（${week[now.getDay()]}）`;
+
+  const summary = document.getElementById("todayAgendaSummary");
+  const content = document.getElementById("todayAgendaContent");
+
+  if(events.length === 0){
+    summary.innerHTML = "";
+    content.innerHTML =
+      `<div class="todayAgendaEmpty">今日は予定はありません🌷<br>ゆっくり過ごせます</div>`;
+    return;
+  }
+
+  summary.innerHTML =
+    `<span class="todayAgendaCount">今日の予定 ${events.length}件</span>`;
+
+  content.innerHTML = "";
+
+  events.forEach(event=>{
+
+    const meta = getCategoryMeta(event.category);
+
+    const item = document.createElement("div");
+    item.className = "todayAgendaItem " + meta.borderClass;
+
+    const top = document.createElement("div");
+    top.className = "todayAgendaTop";
+
+    const category = document.createElement("span");
+    category.className = "categoryBadge " + meta.className;
+    category.textContent = event.category;
+    top.appendChild(category);
+
+    const time = document.createElement("span");
+    time.className = "timeBadge";
+    time.textContent = event.time || "終日";
+    top.appendChild(time);
+
+    item.appendChild(top);
+
+    const title = document.createElement("div");
+    title.className = "todayAgendaTitle";
+    title.textContent = event.text;
+    item.appendChild(title);
+
+    if(event.memo){
+      const memo = document.createElement("div");
+      memo.className = "todayAgendaMemo";
+      memo.textContent = event.memo;
+      item.appendChild(memo);
+    }
+
+    content.appendChild(item);
+  });
+}
+
 function clearScheduleInputs(){
   document.getElementById("scheduleCategory").value = "病院";
   document.getElementById("scheduleTime").value = "";
   document.getElementById("scheduleTitle").value = "";
   document.getElementById("scheduleMemo").value = "";
+}
+
+function setFormToAddMode(){
+  editingScheduleId = null;
+  document.getElementById("formSectionTitle").textContent = "新しい予定を追加";
+  document.getElementById("formModeBox").textContent = "追加モードです";
+  document.getElementById("saveScheduleBtn").textContent = "予定を追加";
+  document.getElementById("cancelEditBtn").style.display = "none";
+  clearScheduleInputs();
+}
+
+function setFormToEditMode(item){
+  editingScheduleId = item.id;
+  document.getElementById("formSectionTitle").textContent = "予定を編集";
+  document.getElementById("formModeBox").textContent = "編集中です。内容を直して「予定を更新」を押してください";
+  document.getElementById("saveScheduleBtn").textContent = "予定を更新";
+  document.getElementById("cancelEditBtn").style.display = "block";
+
+  document.getElementById("scheduleCategory").value = item.category || "その他";
+  document.getElementById("scheduleTime").value = item.time || "";
+  document.getElementById("scheduleTitle").value = item.text || "";
+  document.getElementById("scheduleMemo").value = item.memo || "";
 }
 
 function openScheduleModal(dateKey){
@@ -1109,18 +1310,50 @@ function openScheduleModal(dateKey){
     `${y}年${Number(m)}月${Number(d)}日の予定`;
 
   renderScheduleList();
-  clearScheduleInputs();
+  setFormToAddMode();
 
   document.getElementById("scheduleModal").style.display = "flex";
 }
 
 function closeScheduleModal(){
   document.getElementById("scheduleModal").style.display = "none";
+  setFormToAddMode();
+}
+
+function cancelEditMode(){
+  setFormToAddMode();
+}
+
+function findScheduleById(dateKey, id){
+  return getUserSchedules(dateKey).find(item=>item.id === id);
+}
+
+function startEditSchedule(id){
+
+  const item = findScheduleById(selectedDateKey, id);
+
+  if(!item){
+    alert("編集する予定が見つかりませんでした");
+    return;
+  }
+
+  setFormToEditMode(item);
 }
 
 function deleteScheduleById(dateKey, id){
 
-  const list = getUserSchedules(dateKey).filter(item=>item.id !== id);
+  const item = findScheduleById(dateKey, id);
+
+  if(!item){
+    return;
+  }
+
+  const ok = confirm(`「${item.text}」を削除しますか？`);
+  if(!ok){
+    return;
+  }
+
+  const list = getUserSchedules(dateKey).filter(v=>v.id !== id);
 
   if(list.length){
     schedules[dateKey] = list;
@@ -1131,6 +1364,12 @@ function deleteScheduleById(dateKey, id){
   saveSchedulesData();
   renderScheduleList();
   renderCalendar();
+
+  if(editingScheduleId === id){
+    setFormToAddMode();
+  }
+
+  alert("予定を削除しました✨");
 }
 
 function renderScheduleList(){
@@ -1172,13 +1411,26 @@ function renderScheduleList(){
     top.appendChild(metaWrap);
 
     if(!event.isAnniversary){
+      const actionWrap = document.createElement("div");
+      actionWrap.className = "itemActionButtons";
+
+      const editBtn = document.createElement("button");
+      editBtn.className = "smallBtn editSmallBtn";
+      editBtn.textContent = "編集";
+      editBtn.onclick = function(){
+        startEditSchedule(event.id);
+      };
+
       const delBtn = document.createElement("button");
-      delBtn.className = "deleteSmallBtn";
+      delBtn.className = "smallBtn deleteSmallBtn";
       delBtn.textContent = "削除";
       delBtn.onclick = function(){
         deleteScheduleById(selectedDateKey, event.id);
       };
-      top.appendChild(delBtn);
+
+      actionWrap.appendChild(editBtn);
+      actionWrap.appendChild(delBtn);
+      top.appendChild(actionWrap);
     }
 
     item.appendChild(top);
@@ -1206,7 +1458,7 @@ function renderScheduleList(){
   });
 }
 
-function addSchedule(){
+function saveScheduleForm(){
 
   const category = document.getElementById("scheduleCategory").value;
   const time = document.getElementById("scheduleTime").value;
@@ -1222,6 +1474,33 @@ function addSchedule(){
     schedules[selectedDateKey] = [];
   }
 
+  if(editingScheduleId){
+
+    schedules[selectedDateKey] = schedules[selectedDateKey].map(item=>{
+
+      if(item.id === editingScheduleId){
+        return {
+          ...item,
+          category:category,
+          time:time,
+          text:text,
+          memo:memo
+        };
+      }
+
+      return item;
+    });
+
+    schedules[selectedDateKey] = sortEvents(schedules[selectedDateKey]);
+    saveSchedulesData();
+    renderScheduleList();
+    renderCalendar();
+    setFormToAddMode();
+
+    alert("予定を更新しました✨");
+    return;
+  }
+
   schedules[selectedDateKey].push({
     id:createId(),
     category:category,
@@ -1235,7 +1514,7 @@ function addSchedule(){
   saveSchedulesData();
   renderScheduleList();
   renderCalendar();
-  clearScheduleInputs();
+  setFormToAddMode();
 
   alert("予定を追加しました✨");
 }
@@ -1333,6 +1612,8 @@ function renderCalendar(){
 
     calendar.appendChild(cell);
   }
+
+  renderTodaySchedule();
 }
 
 function changeMonth(step){
