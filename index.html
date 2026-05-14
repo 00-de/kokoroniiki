@@ -78,7 +78,7 @@ body{
   text-align:center;
   color:#777;
   font-size:0.9em;
-  margin-top:6px;
+  margin-top:8px;
   line-height:1.6;
 }
 
@@ -204,10 +204,11 @@ input,select,textarea{
   border:1px solid #ddd;
   font-size:1em;
   font-family:inherit;
+  background:white;
 }
 
 textarea{
-  min-height:140px;
+  min-height:100px;
   resize:vertical;
 }
 
@@ -247,15 +248,20 @@ textarea{
 
 .calendarCell{
   background:#fff7fb;
-  border-radius:16px;
-  min-height:88px;
+  border-radius:18px;
+  min-height:118px;
   display:flex;
   flex-direction:column;
   align-items:flex-start;
   justify-content:flex-start;
   box-shadow:0 2px 8px rgba(0,0,0,0.04);
-  padding:8px 6px;
+  padding:8px 6px 10px 6px;
   cursor:pointer;
+  transition:0.2s;
+}
+
+.calendarCell:active{
+  transform:scale(0.98);
 }
 
 .calendarCell.empty{
@@ -265,33 +271,71 @@ textarea{
 }
 
 .calendarCell.today{
-  background:#ff7fb0;
+  background:linear-gradient(180deg,#ff7fb0,#ff96bf);
   color:white;
   font-weight:bold;
+}
+
+.calendarCell.hasEvent{
+  background:linear-gradient(180deg,#fff0f7,#ffe1ee);
+  border:2px solid #ff9dc4;
+  box-shadow:0 8px 18px rgba(255,127,176,0.18);
+}
+
+.calendarCell.today.hasEvent{
+  background:linear-gradient(180deg,#ff5d9a,#ff89b7);
+  border:2px solid rgba(255,255,255,0.95);
+  box-shadow:0 10px 22px rgba(255,105,155,0.34);
 }
 
 .dateNum{
   align-self:flex-end;
   font-weight:bold;
+  font-size:0.95em;
 }
 
-.scheduleDot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:var(--accent);
+.eventCount{
+  align-self:flex-start;
+  margin-top:4px;
+  font-size:0.54em;
+  line-height:1;
+  padding:4px 8px;
+  border-radius:999px;
+  background:#fff;
+  color:#ff6699;
+  font-weight:bold;
+}
+
+.calendarCell.today .eventCount{
+  background:rgba(255,255,255,0.2);
+  color:white;
+  border:1px solid rgba(255,255,255,0.45);
+}
+
+.miniBadgeRow{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
   margin-top:6px;
 }
 
-.calendarCell.today .scheduleDot{
-  background:white;
+.miniBadge{
+  font-size:0.5em;
+  line-height:1;
+  padding:4px 6px;
+  border-radius:999px;
+  color:white;
+  font-weight:bold;
 }
 
-.schedulePreview{
-  font-size:0.58em;
-  line-height:1.45;
-  margin-top:6px;
-  color:#666;
+.eventLine{
+  font-size:0.56em;
+  line-height:1.4;
+  margin-top:5px;
+  width:100%;
+  padding-left:6px;
+  border-left:4px solid #ccc;
+  color:#555;
   word-break:break-word;
   overflow:hidden;
   display:-webkit-box;
@@ -299,9 +343,33 @@ textarea{
   -webkit-box-orient:vertical;
 }
 
-.calendarCell.today .schedulePreview{
+.calendarCell.today .eventLine{
+  color:white;
+  border-left-color:rgba(255,255,255,0.95);
+}
+
+.moreLine{
+  font-size:0.54em;
+  margin-top:4px;
+  color:#777;
+  font-weight:bold;
+}
+
+.calendarCell.today .moreLine{
   color:white;
 }
+
+.cat-hospital{ background:#ff7f9d; }
+.cat-shopping{ background:#ffb14a; }
+.cat-medicine{ background:#5aa7ff; }
+.cat-anniversary{ background:#b07cff; }
+.cat-other{ background:#7f96a8; }
+
+.border-hospital{ border-left-color:#ff7f9d; }
+.border-shopping{ border-left-color:#ffb14a; }
+.border-medicine{ border-left-color:#5aa7ff; }
+.border-anniversary{ border-left-color:#b07cff; }
+.border-other{ border-left-color:#7f96a8; }
 
 .miniBtn{
   border:none;
@@ -319,6 +387,98 @@ textarea{
   color:#ff6699;
   margin-bottom:10px;
   line-height:1.6;
+}
+
+.sectionLabel{
+  font-weight:bold;
+  margin:12px 0 6px 0;
+  color:#666;
+}
+
+.scheduleList{
+  margin-bottom:16px;
+}
+
+.emptySchedule{
+  background:#fafafa;
+  border-radius:18px;
+  padding:14px;
+  text-align:center;
+  color:#888;
+  line-height:1.6;
+}
+
+.scheduleItem{
+  background:#fff7fb;
+  border-radius:18px;
+  padding:14px;
+  margin-bottom:10px;
+  border:2px solid rgba(255,127,176,0.1);
+}
+
+.scheduleItemTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+}
+
+.scheduleMeta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+}
+
+.categoryBadge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  color:white;
+  font-size:0.8em;
+  font-weight:bold;
+}
+
+.timeBadge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  background:#f1f4f8;
+  color:#555;
+  font-size:0.8em;
+  font-weight:bold;
+}
+
+.scheduleText{
+  margin-top:10px;
+  font-weight:bold;
+  line-height:1.6;
+}
+
+.scheduleMemo{
+  margin-top:8px;
+  color:#666;
+  line-height:1.6;
+  font-size:0.92em;
+  white-space:pre-wrap;
+}
+
+.readOnlyNote{
+  margin-top:8px;
+  color:#8a74c9;
+  font-size:0.86em;
+  line-height:1.6;
+}
+
+.deleteSmallBtn{
+  border:none;
+  background:#ffe4ec;
+  color:#a44;
+  border-radius:12px;
+  padding:8px 12px;
+  cursor:pointer;
+  font-size:0.82em;
+  white-space:nowrap;
 }
 
 .footerSpace{
@@ -368,7 +528,7 @@ textarea{
   <div class="calendarGrid" id="calendar"></div>
 
   <div class="subText">
-    日付をタップすると予定を登録できます✨
+    日付をタップすると、その日の予定を複数登録できます✨
   </div>
 
 </div>
@@ -454,7 +614,9 @@ textarea{
     <input type="text" id="city" placeholder="住んでいる地域">
     <input type="date" id="birthday">
     <input type="text" id="hobby" placeholder="趣味">
-    <input type="text" id="anniversary" placeholder="記念日">
+
+    <input type="text" id="anniversaryName" placeholder="記念日名（例：結婚記念日）">
+    <input type="date" id="anniversaryDate">
 
     <div class="title">🔠文字サイズ</div>
 
@@ -479,18 +641,30 @@ textarea{
 <div class="modal" id="scheduleModal">
   <div class="modalContent">
 
-    <div class="title">🗓️ 予定入力</div>
+    <div class="title">🗓️ 予定一覧・追加</div>
 
     <div class="selectedDateLabel" id="selectedDateLabel"></div>
 
-    <textarea id="scheduleInput" placeholder="ここに予定を書いてください&#10;例）10:00 病院&#10;14:00 買い物"></textarea>
+    <div class="sectionLabel">この日の予定</div>
+    <div class="scheduleList" id="scheduleList"></div>
 
-    <button class="btn" onclick="saveSchedule()">
-      予定を保存
-    </button>
+    <div class="sectionLabel">新しい予定を追加</div>
 
-    <button class="btn" onclick="deleteSchedule()">
-      この日の予定を削除
+    <select id="scheduleCategory">
+      <option value="病院">病院</option>
+      <option value="買い物">買い物</option>
+      <option value="薬">薬</option>
+      <option value="その他">その他</option>
+    </select>
+
+    <input type="time" id="scheduleTime">
+
+    <input type="text" id="scheduleTitle" placeholder="予定名（例：内科受診、スーパー、朝の薬）">
+
+    <textarea id="scheduleMemo" placeholder="メモ（任意）"></textarea>
+
+    <button class="btn" onclick="addSchedule()">
+      予定を追加
     </button>
 
     <button class="btn" onclick="closeScheduleModal()">
@@ -600,6 +774,37 @@ function closeSettings(){
   document.getElementById("modal").style.display="none";
 }
 
+function refreshAnniversaryText(){
+
+  const name =
+    localStorage.getItem("anniversaryName") ||
+    localStorage.getItem("anniversary") ||
+    "";
+
+  const date = localStorage.getItem("anniversaryDate") || "";
+
+  if(date){
+    const parts = date.split("-");
+    const month = Number(parts[1]);
+    const day = Number(parts[2]);
+
+    document.getElementById("anniversaryText").innerHTML =
+      `🎉 ${name || "記念日"}<br>` +
+      `毎年 ${month}月${day}日`;
+    return;
+  }
+
+  if(name){
+    document.getElementById("anniversaryText").innerHTML =
+      `🎉 ${name}<br>` +
+      `<span style="font-size:0.85em;color:#777;">日付を設定するとカレンダーに自動表示されます</span>`;
+    return;
+  }
+
+  document.getElementById("anniversaryText").innerHTML =
+    "記念日を設定してください✨";
+}
+
 function saveSettings(){
 
   const ids = [
@@ -608,7 +813,8 @@ function saveSettings(){
     "city",
     "birthday",
     "hobby",
-    "anniversary"
+    "anniversaryName",
+    "anniversaryDate"
   ];
 
   ids.forEach(id=>{
@@ -618,10 +824,8 @@ function saveSettings(){
     );
   });
 
-  document.getElementById("anniversaryText").innerHTML =
-  document.getElementById("anniversary").value
-  ? "🎉 " + document.getElementById("anniversary").value
-  : "記念日を設定してください✨";
+  refreshAnniversaryText();
+  renderCalendar();
 
   alert("保存しました✨");
   closeSettings();
@@ -629,13 +833,16 @@ function saveSettings(){
 
 function loadSettings(){
 
+  const legacyAnniversary = localStorage.getItem("anniversary") || "";
+
   const ids = [
     "name",
     "nickname",
     "city",
     "birthday",
     "hobby",
-    "anniversary"
+    "anniversaryName",
+    "anniversaryDate"
   ];
 
   ids.forEach(id=>{
@@ -643,12 +850,15 @@ function loadSettings(){
     localStorage.getItem(id)||"";
   });
 
-  const savedAnniversary = localStorage.getItem("anniversary");
+  if(
+    !document.getElementById("anniversaryName").value &&
+    legacyAnniversary
+  ){
+    document.getElementById("anniversaryName").value =
+    legacyAnniversary;
+  }
 
-  document.getElementById("anniversaryText").innerHTML =
-  savedAnniversary
-  ? "🎉 " + savedAnniversary
-  : "記念日を設定してください✨";
+  refreshAnniversaryText();
 }
 
 loadSettings();
@@ -672,18 +882,221 @@ let calendarDate = new Date(
   1
 );
 
-const scheduleStorageKey = "calendarSchedules";
-let schedules = JSON.parse(
-  localStorage.getItem(scheduleStorageKey) || "{}"
-);
-
+const scheduleStorageKey = "calendarSchedulesV2";
 let selectedDateKey = "";
+
+const categoryMeta = {
+  "病院": {
+    className:"cat-hospital",
+    borderClass:"border-hospital"
+  },
+  "買い物": {
+    className:"cat-shopping",
+    borderClass:"border-shopping"
+  },
+  "薬": {
+    className:"cat-medicine",
+    borderClass:"border-medicine"
+  },
+  "記念日": {
+    className:"cat-anniversary",
+    borderClass:"border-anniversary"
+  },
+  "その他": {
+    className:"cat-other",
+    borderClass:"border-other"
+  }
+};
+
+function createId(){
+  return "id-" + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+}
+
+function getCategoryMeta(category){
+  return categoryMeta[category] || categoryMeta["その他"];
+}
+
+function normalizeScheduleItem(item){
+
+  if(typeof item === "string"){
+    return {
+      id:createId(),
+      category:"その他",
+      time:"",
+      text:item,
+      memo:""
+    };
+  }
+
+  return {
+    id:item.id || createId(),
+    category:item.category || "その他",
+    time:item.time || "",
+    text:item.text || "",
+    memo:item.memo || ""
+  };
+}
+
+function loadSchedulesData(){
+
+  try{
+    const raw = localStorage.getItem(scheduleStorageKey);
+
+    if(raw){
+      const parsed = JSON.parse(raw);
+      const normalized = {};
+
+      Object.keys(parsed).forEach(dateKey=>{
+        const value = parsed[dateKey];
+
+        if(Array.isArray(value)){
+          normalized[dateKey] =
+            value
+            .map(normalizeScheduleItem)
+            .filter(v=>v.text && v.text.trim());
+        }else if(typeof value === "string" && value.trim()){
+          normalized[dateKey] = [normalizeScheduleItem(value)];
+        }
+      });
+
+      localStorage.setItem(
+        scheduleStorageKey,
+        JSON.stringify(normalized)
+      );
+
+      return normalized;
+    }
+  }catch(e){
+  }
+
+  try{
+    const oldRaw = localStorage.getItem("calendarSchedules");
+
+    if(oldRaw){
+      const oldParsed = JSON.parse(oldRaw);
+      const converted = {};
+
+      Object.keys(oldParsed).forEach(dateKey=>{
+        const value = oldParsed[dateKey];
+
+        if(Array.isArray(value)){
+          converted[dateKey] =
+            value
+            .map(normalizeScheduleItem)
+            .filter(v=>v.text && v.text.trim());
+        }else if(typeof value === "string" && value.trim()){
+          converted[dateKey] = [normalizeScheduleItem(value)];
+        }
+      });
+
+      localStorage.setItem(
+        scheduleStorageKey,
+        JSON.stringify(converted)
+      );
+
+      return converted;
+    }
+  }catch(e){
+  }
+
+  return {};
+}
+
+let schedules = loadSchedulesData();
+
+function saveSchedulesData(){
+  localStorage.setItem(
+    scheduleStorageKey,
+    JSON.stringify(schedules)
+  );
+}
 
 function getDateKey(year, month, day){
   const y = year;
   const m = String(month + 1).padStart(2,"0");
   const d = String(day).padStart(2,"0");
   return `${y}-${m}-${d}`;
+}
+
+function getAnniversaryEventForDate(dateKey){
+
+  const anniversaryDate = localStorage.getItem("anniversaryDate") || "";
+  const anniversaryName =
+    localStorage.getItem("anniversaryName") ||
+    localStorage.getItem("anniversary") ||
+    "";
+
+  if(!anniversaryDate){
+    return null;
+  }
+
+  const parts = anniversaryDate.split("-");
+  if(parts.length !== 3){
+    return null;
+  }
+
+  const month = parts[1];
+  const day = parts[2];
+
+  const dateParts = dateKey.split("-");
+  const targetMonth = dateParts[1];
+  const targetDay = dateParts[2];
+
+  if(month === targetMonth && day === targetDay){
+    return {
+      id:"anniversary-" + month + day,
+      category:"記念日",
+      time:"",
+      text:anniversaryName || "記念日",
+      memo:"毎年くり返し表示される記念日です",
+      isAnniversary:true
+    };
+  }
+
+  return null;
+}
+
+function sortEvents(list){
+
+  return [...list].sort((a,b)=>{
+
+    if(a.isAnniversary && !b.isAnniversary) return -1;
+    if(!a.isAnniversary && b.isAnniversary) return 1;
+
+    const timeA = a.time || "99:99";
+    const timeB = b.time || "99:99";
+
+    return timeA.localeCompare(timeB);
+  });
+}
+
+function getUserSchedules(dateKey){
+  return Array.isArray(schedules[dateKey])
+    ? schedules[dateKey]
+    : [];
+}
+
+function getEventsForDate(dateKey){
+
+  const list = [];
+  const anniversaryEvent = getAnniversaryEventForDate(dateKey);
+
+  if(anniversaryEvent){
+    list.push(anniversaryEvent);
+  }
+
+  getUserSchedules(dateKey).forEach(item=>{
+    list.push(item);
+  });
+
+  return sortEvents(list);
+}
+
+function clearScheduleInputs(){
+  document.getElementById("scheduleCategory").value = "病院";
+  document.getElementById("scheduleTime").value = "";
+  document.getElementById("scheduleTitle").value = "";
+  document.getElementById("scheduleMemo").value = "";
 }
 
 function openScheduleModal(dateKey){
@@ -693,10 +1106,10 @@ function openScheduleModal(dateKey){
   const [y,m,d] = dateKey.split("-");
 
   document.getElementById("selectedDateLabel").innerHTML =
-  `${y}年${Number(m)}月${Number(d)}日の予定`;
+    `${y}年${Number(m)}月${Number(d)}日の予定`;
 
-  document.getElementById("scheduleInput").value =
-  schedules[dateKey] || "";
+  renderScheduleList();
+  clearScheduleInputs();
 
   document.getElementById("scheduleModal").style.display = "flex";
 }
@@ -705,41 +1118,126 @@ function closeScheduleModal(){
   document.getElementById("scheduleModal").style.display = "none";
 }
 
-function saveSchedule(){
+function deleteScheduleById(dateKey, id){
 
-  const text = document.getElementById("scheduleInput").value.trim();
+  const list = getUserSchedules(dateKey).filter(item=>item.id !== id);
 
-  if(text){
-    schedules[selectedDateKey] = text;
+  if(list.length){
+    schedules[dateKey] = list;
   }else{
-    delete schedules[selectedDateKey];
+    delete schedules[dateKey];
   }
 
-  localStorage.setItem(
-    scheduleStorageKey,
-    JSON.stringify(schedules)
-  );
-
+  saveSchedulesData();
+  renderScheduleList();
   renderCalendar();
-  closeScheduleModal();
-  alert("予定を保存しました✨");
 }
 
-function deleteSchedule(){
+function renderScheduleList(){
 
-  if(selectedDateKey && schedules[selectedDateKey]){
-    delete schedules[selectedDateKey];
+  const scheduleList = document.getElementById("scheduleList");
+  const events = getEventsForDate(selectedDateKey);
 
-    localStorage.setItem(
-      scheduleStorageKey,
-      JSON.stringify(schedules)
-    );
+  scheduleList.innerHTML = "";
+
+  if(!events.length){
+    scheduleList.innerHTML =
+      `<div class="emptySchedule">この日の予定はまだありません</div>`;
+    return;
   }
 
-  document.getElementById("scheduleInput").value = "";
+  events.forEach(event=>{
+
+    const meta = getCategoryMeta(event.category);
+
+    const item = document.createElement("div");
+    item.className = "scheduleItem";
+
+    const top = document.createElement("div");
+    top.className = "scheduleItemTop";
+
+    const metaWrap = document.createElement("div");
+    metaWrap.className = "scheduleMeta";
+
+    const category = document.createElement("span");
+    category.className = "categoryBadge " + meta.className;
+    category.textContent = event.category;
+    metaWrap.appendChild(category);
+
+    const time = document.createElement("span");
+    time.className = "timeBadge";
+    time.textContent = event.time || "終日";
+    metaWrap.appendChild(time);
+
+    top.appendChild(metaWrap);
+
+    if(!event.isAnniversary){
+      const delBtn = document.createElement("button");
+      delBtn.className = "deleteSmallBtn";
+      delBtn.textContent = "削除";
+      delBtn.onclick = function(){
+        deleteScheduleById(selectedDateKey, event.id);
+      };
+      top.appendChild(delBtn);
+    }
+
+    item.appendChild(top);
+
+    const text = document.createElement("div");
+    text.className = "scheduleText";
+    text.textContent = event.text;
+    item.appendChild(text);
+
+    if(event.memo){
+      const memo = document.createElement("div");
+      memo.className = "scheduleMemo";
+      memo.textContent = event.memo;
+      item.appendChild(memo);
+    }
+
+    if(event.isAnniversary){
+      const note = document.createElement("div");
+      note.className = "readOnlyNote";
+      note.textContent = "※ 記念日は設定画面から変更できます";
+      item.appendChild(note);
+    }
+
+    scheduleList.appendChild(item);
+  });
+}
+
+function addSchedule(){
+
+  const category = document.getElementById("scheduleCategory").value;
+  const time = document.getElementById("scheduleTime").value;
+  const text = document.getElementById("scheduleTitle").value.trim();
+  const memo = document.getElementById("scheduleMemo").value.trim();
+
+  if(!text){
+    alert("予定名を入力してください");
+    return;
+  }
+
+  if(!schedules[selectedDateKey]){
+    schedules[selectedDateKey] = [];
+  }
+
+  schedules[selectedDateKey].push({
+    id:createId(),
+    category:category,
+    time:time,
+    text:text,
+    memo:memo
+  });
+
+  schedules[selectedDateKey] = sortEvents(schedules[selectedDateKey]);
+
+  saveSchedulesData();
+  renderScheduleList();
   renderCalendar();
-  closeScheduleModal();
-  alert("予定を削除しました✨");
+  clearScheduleInputs();
+
+  alert("予定を追加しました✨");
 }
 
 function renderCalendar(){
@@ -767,6 +1265,7 @@ function renderCalendar(){
   for(let day = 1; day <= lastDate; day++){
 
     const dateKey = getDateKey(year, month, day);
+    const events = getEventsForDate(dateKey);
 
     const isToday =
       today.getFullYear() === year &&
@@ -774,7 +1273,16 @@ function renderCalendar(){
       today.getDate() === day;
 
     const cell = document.createElement("div");
-    cell.className = "calendarCell" + (isToday ? " today" : "");
+    cell.className = "calendarCell";
+
+    if(isToday){
+      cell.classList.add("today");
+    }
+
+    if(events.length > 0){
+      cell.classList.add("hasEvent");
+    }
+
     cell.onclick = function(){
       openScheduleModal(dateKey);
     };
@@ -784,16 +1292,43 @@ function renderCalendar(){
     dateNum.textContent = day;
     cell.appendChild(dateNum);
 
-    if(schedules[dateKey]){
+    if(events.length > 0){
 
-      const dot = document.createElement("div");
-      dot.className = "scheduleDot";
-      cell.appendChild(dot);
+      const count = document.createElement("div");
+      count.className = "eventCount";
+      count.textContent = events.length + "件";
+      cell.appendChild(count);
 
-      const preview = document.createElement("div");
-      preview.className = "schedulePreview";
-      preview.textContent = schedules[dateKey];
-      cell.appendChild(preview);
+      const badgeRow = document.createElement("div");
+      badgeRow.className = "miniBadgeRow";
+
+      const uniqueCategories = [...new Set(events.map(e=>e.category))].slice(0,3);
+
+      uniqueCategories.forEach(category=>{
+        const meta = getCategoryMeta(category);
+        const badge = document.createElement("span");
+        badge.className = "miniBadge " + meta.className;
+        badge.textContent = category;
+        badgeRow.appendChild(badge);
+      });
+
+      cell.appendChild(badgeRow);
+
+      events.slice(0,2).forEach(event=>{
+        const meta = getCategoryMeta(event.category);
+        const line = document.createElement("div");
+        line.className = "eventLine " + meta.borderClass;
+        line.textContent =
+          (event.time ? event.time + " " : "") + event.text;
+        cell.appendChild(line);
+      });
+
+      if(events.length > 2){
+        const more = document.createElement("div");
+        more.className = "moreLine";
+        more.textContent = "ほか " + (events.length - 2) + "件";
+        cell.appendChild(more);
+      }
     }
 
     calendar.appendChild(cell);
