@@ -598,6 +598,85 @@ textarea{
   line-height:1.6;
 }
 
+/* 日本の国クイズ 追加 */
+.quizCard{
+  background:linear-gradient(180deg,#f7f7ff,#ffffff);
+  border:2px solid #cfd6ff;
+  box-shadow:0 10px 24px rgba(115,125,255,0.10);
+}
+
+.quizStatus{
+  text-align:center;
+  color:#6a72b8;
+  font-weight:bold;
+  margin-bottom:12px;
+  line-height:1.6;
+}
+
+.quizQuestion{
+  font-size:1.02em;
+  font-weight:bold;
+  line-height:1.8;
+  margin-bottom:14px;
+  text-align:center;
+}
+
+.quizChoices{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+
+.quizChoiceBtn{
+  border:none;
+  border-radius:18px;
+  padding:16px;
+  background:#eef1ff;
+  color:#394b74;
+  font-size:0.98em;
+  cursor:pointer;
+  text-align:left;
+  line-height:1.6;
+}
+
+.quizChoiceBtn:active{
+  transform:scale(0.98);
+}
+
+.quizChoiceBtn.correct{
+  background:#dff6e8;
+  color:#236847;
+}
+
+.quizChoiceBtn.wrong{
+  background:#ffe5ea;
+  color:#a44;
+}
+
+.quizResult{
+  margin-top:14px;
+  text-align:center;
+  font-weight:bold;
+  line-height:1.7;
+  min-height:2.2em;
+}
+
+.quizSource{
+  text-align:center;
+  color:#777;
+  font-size:0.82em;
+  margin-top:10px;
+  line-height:1.6;
+  word-break:break-all;
+}
+
+.quizActions{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:14px;
+}
+
 .footerSpace{
   height:60px;
 }
@@ -627,6 +706,35 @@ textarea{
   <button class="btn" onclick="loadWeatherByGPS()">
     現在地の天気を再取得
   </button>
+</div>
+
+<!-- 日本の国だけクイズ 追加 -->
+<div class="card quizCard">
+  <div class="title">🇯🇵 日本の国クイズ</div>
+
+  <div class="quizStatus" id="quizStatus">
+    インターネットから日本データを取得します...
+  </div>
+
+  <div class="quizQuestion" id="quizQuestion">
+    読み込み中です...
+  </div>
+
+  <div class="quizChoices" id="quizChoices"></div>
+
+  <div class="quizResult" id="quizResult"></div>
+
+  <div class="quizActions">
+    <button class="btn btnPrimary" id="nextQuizBtn" onclick="nextJapanQuiz()" style="display:none;">
+      次の問題へ
+    </button>
+
+    <button class="btn btnSub" onclick="loadJapanQuiz()">
+      日本クイズをインターネットから再取得
+    </button>
+  </div>
+
+  <div class="quizSource" id="quizSource"></div>
 </div>
 
 <div class="card">
@@ -1796,6 +1904,290 @@ function loadWeatherByGPS(){
   );
 }
 
+/* 日本の国だけクイズ 追加 */
+const japanQuizState = {
+  questions: [],
+  index: 0,
+  score: 0,
+  sourceUrl: "https://restcountries.com/v3.1/name/japan?fullText=true",
+  fromCache: false
+};
+
+function shuffleArray(array){
+  const arr = [...array];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function getJapanLanguageLabel(country){
+  const langs = Object.values(country.languages || {});
+  if(!langs.length) return "日本語";
+
+  const first = langs[0];
+  if(/japanese/i.test(first)) return "日本語";
+  return first;
+}
+
+function getJapanCurrencyLabel(country){
+  const code = Object.keys(country.currencies || {})[0] || "JPY";
+  const info = (country.currencies || {})[code] || {};
+  const name = info.name || "Japanese yen";
+  const symbol = info.symbol || "¥";
+  return {
+    code,
+    label: `${symbol} ${name} (${code})`
+  };
+}
+
+function buildJapanQuizQuestions(country){
+
+  const currency = getJapanCurrencyLabel(country);
+  const timezone = country.timezones?.[0] || "UTC+09:00";
+  const callingCode = `${country.idd?.root || "+"}${country.idd?.suffixes?.[0] || "81"}`;
+  const postalFormat = country.postalCode?.format || "###-####";
+  const areaText = `${Math.round(country.area || 377930).toLocaleString("ja-JP")} km²`;
+  const populationText = `${Number(country.population || 123210000).toLocaleString("ja-JP")}人`;
+  const carSide = country.car?.side === "left" ? "左側通行" : "右側通行";
+
+  const baseQuestions = [
+    {
+      question: "日本の首都はどこ？",
+      choices: shuffleArray(["東京","大阪","京都","札幌"]),
+      answer: "東京"
+    },
+    {
+      question: "日本の通貨コードは？",
+      choices: shuffleArray([currency.code,"USD","CNY","KRW"]),
+      answer: currency.code
+    },
+    {
+      question: "日本で主に使われる言語は？",
+      choices: shuffleArray(["日本語","英語","中国語","韓国語"]),
+      answer: "日本語"
+    },
+    {
+      question: "日本の標準時は？",
+      choices: shuffleArray([timezone,"UTC+08:00","UTC+10:00","UTC+07:00"]),
+      answer: timezone
+    },
+    {
+      question: "日本の国際電話番号は？",
+      choices: shuffleArray([callingCode,"+82","+86","+66"]),
+      answer: callingCode
+    },
+    {
+      question: "日本の車はどちら側通行？",
+      choices: shuffleArray([carSide,"右側通行","中央通行","地域で毎回変わる"]),
+      answer: carSide
+    },
+    {
+      question: "日本の郵便番号の基本形式は？",
+      choices: shuffleArray([postalFormat,"#####","AA-0000","000-00"]),
+      answer: postalFormat
+    },
+    {
+      question: "日本はどの地域に分類される？",
+      choices: shuffleArray(["アジア","ヨーロッパ","北アメリカ","オセアニア"]),
+      answer: "アジア"
+    },
+    {
+      question: "日本のより細かい地域区分は？",
+      choices: shuffleArray(["東アジア","東南アジア","南アジア","中央アジア"]),
+      answer: "東アジア"
+    },
+    {
+      question: "日本の面積に最も近いのは？",
+      choices: shuffleArray([areaText,"150,000 km²","900,000 km²","2,500,000 km²"]),
+      answer: areaText
+    },
+    {
+      question: "日本の人口に最も近いのは？",
+      choices: shuffleArray([populationText,"6,500万人","3,300万人","2億4,000万人"]),
+      answer: populationText
+    },
+    {
+      question: "日本の通貨として正しいのは？",
+      choices: shuffleArray([currency.label,"$ US Dollar (USD)","₩ South Korean won (KRW)","¥ Chinese yuan (CNY)"]),
+      answer: currency.label
+    }
+  ];
+
+  return shuffleArray(baseQuestions).slice(0, 6);
+}
+
+function updateQuizSource(){
+
+  const sourceEl = document.getElementById("quizSource");
+
+  if(japanQuizState.fromCache){
+    sourceEl.innerHTML =
+      `取得元：<a href="${japanQuizState.sourceUrl}" target="_blank" rel="noopener noreferrer">REST Countries API（Japan）</a><br>` +
+      `※ 通信失敗のため前回保存データを使用中`;
+    return;
+  }
+
+  sourceEl.innerHTML =
+    `取得元：<a href="${japanQuizState.sourceUrl}" target="_blank" rel="noopener noreferrer">REST Countries API（Japan）</a>`;
+}
+
+function renderJapanQuiz(){
+
+  const status = document.getElementById("quizStatus");
+  const questionEl = document.getElementById("quizQuestion");
+  const choicesEl = document.getElementById("quizChoices");
+  const resultEl = document.getElementById("quizResult");
+  const nextBtn = document.getElementById("nextQuizBtn");
+
+  updateQuizSource();
+
+  if(
+    !japanQuizState.questions.length ||
+    japanQuizState.index >= japanQuizState.questions.length
+  ){
+    status.innerHTML = `終了しました✨ ${japanQuizState.questions.length}問中 ${japanQuizState.score}問正解`;
+    questionEl.innerHTML = "🎉 日本クイズ終了です";
+    choicesEl.innerHTML = "";
+    resultEl.innerHTML = "もう一度取得すると、新しい並びで出題します。";
+    nextBtn.style.display = "none";
+    return;
+  }
+
+  const current = japanQuizState.questions[japanQuizState.index];
+
+  if(japanQuizState.fromCache){
+    status.innerHTML =
+      `問題 ${japanQuizState.index + 1} / ${japanQuizState.questions.length}　正解 ${japanQuizState.score}問　（前回データ使用中）`;
+  }else{
+    status.innerHTML =
+      `問題 ${japanQuizState.index + 1} / ${japanQuizState.questions.length}　正解 ${japanQuizState.score}問`;
+  }
+
+  questionEl.textContent = current.question;
+  choicesEl.innerHTML = "";
+  resultEl.innerHTML = "";
+  nextBtn.style.display = "none";
+
+  current.choices.forEach(choice => {
+    const btn = document.createElement("button");
+    btn.className = "quizChoiceBtn";
+    btn.textContent = choice;
+    btn.onclick = function(){
+      answerJapanQuiz(choice);
+    };
+    choicesEl.appendChild(btn);
+  });
+}
+
+function answerJapanQuiz(selectedChoice){
+
+  const current = japanQuizState.questions[japanQuizState.index];
+  if(!current) return;
+
+  const choicesButtons = document.querySelectorAll("#quizChoices .quizChoiceBtn");
+  const resultEl = document.getElementById("quizResult");
+  const nextBtn = document.getElementById("nextQuizBtn");
+
+  choicesButtons.forEach(btn => {
+    btn.disabled = true;
+
+    if(btn.textContent === current.answer){
+      btn.classList.add("correct");
+    }else if(btn.textContent === selectedChoice){
+      btn.classList.add("wrong");
+    }
+  });
+
+  if(selectedChoice === current.answer){
+    japanQuizState.score++;
+    resultEl.innerHTML = "⭕ 正解です！";
+  }else{
+    resultEl.innerHTML = `❌ ちがいます。正解は「${current.answer}」です。`;
+  }
+
+  nextBtn.style.display = "block";
+
+  if(japanQuizState.index === japanQuizState.questions.length - 1){
+    nextBtn.textContent = "結果を見る";
+  }else{
+    nextBtn.textContent = "次の問題へ";
+  }
+}
+
+function nextJapanQuiz(){
+  japanQuizState.index++;
+  renderJapanQuiz();
+}
+
+async function loadJapanQuiz(){
+
+  const status = document.getElementById("quizStatus");
+  const questionEl = document.getElementById("quizQuestion");
+  const choicesEl = document.getElementById("quizChoices");
+  const resultEl = document.getElementById("quizResult");
+  const nextBtn = document.getElementById("nextQuizBtn");
+  const sourceEl = document.getElementById("quizSource");
+
+  status.innerHTML = "インターネットから日本の国データを取得しています...";
+  questionEl.innerHTML = "少し待ってください...";
+  choicesEl.innerHTML = "";
+  resultEl.innerHTML = "";
+  nextBtn.style.display = "none";
+  sourceEl.innerHTML = "";
+
+  try{
+    const res = await fetch(japanQuizState.sourceUrl);
+
+    if(!res.ok){
+      throw new Error("日本データの取得に失敗しました");
+    }
+
+    const data = await res.json();
+    const country = data[0];
+
+    localStorage.setItem("lastJapanCountryData", JSON.stringify(country));
+
+    japanQuizState.questions = buildJapanQuizQuestions(country);
+    japanQuizState.index = 0;
+    japanQuizState.score = 0;
+    japanQuizState.fromCache = false;
+
+    renderJapanQuiz();
+
+  }catch(error){
+
+    const cached = localStorage.getItem("lastJapanCountryData");
+
+    if(cached){
+      try{
+        const country = JSON.parse(cached);
+
+        japanQuizState.questions = buildJapanQuizQuestions(country);
+        japanQuizState.index = 0;
+        japanQuizState.score = 0;
+        japanQuizState.fromCache = true;
+
+        renderJapanQuiz();
+        return;
+      }catch(e){}
+    }
+
+    japanQuizState.questions = [];
+    japanQuizState.index = 0;
+    japanQuizState.score = 0;
+    japanQuizState.fromCache = false;
+
+    status.innerHTML = "日本クイズの取得に失敗しました";
+    questionEl.innerHTML = "通信状態を確認して、もう一度お試しください。";
+    resultEl.innerHTML = "";
+    sourceEl.innerHTML =
+      `取得先：<a href="${japanQuizState.sourceUrl}" target="_blank" rel="noopener noreferrer">REST Countries API</a>`;
+  }
+}
+
+loadJapanQuiz();
 loadWeatherByGPS();
 
 </script>
